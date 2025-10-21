@@ -147,7 +147,7 @@ while Error > Tol
     F_m = BodyForces(X_m, U_m, FlightData, Xdot);
     Xdotm = StateRates(g_m, X_m, F_m, FlightData);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
-
+  
     J(:,3) = (XPDot - XMDot)./(2 * dXTrim);
 
     % J(:,3) = (XTrimDotDe - XTrimDot)/dXTrim;
@@ -156,11 +156,15 @@ while Error > Tol
     % 4d. Newton–Raphson update
     % ---------------------------------------------------------
     % Update guesses for Alpha, Throttle, Elevator
-    XTrim(:,i+1) = 
+    d_X = J\XTrimDot;
+    AlphaTrim = AlphaTrim - d_X(1);
+    DtTrim = DtTrim - d_X(2);
+    DeTrim = DeTrim - d_X(3);
+    XTrim(:,i+1) = f
     
     % Compute error (the normalised error)
-    Error = 
-    
+    Error = norm(d_X);
+     
     % iterate the counter (may want to include a maximum iteration)
     i = i + 1;
 end
