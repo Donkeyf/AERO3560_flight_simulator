@@ -3,7 +3,7 @@ function [X0,U0] = Trim_Scaffold(VelTrim,AltTrim,PsiTrim, FlightData)
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
 % ---------------------------------------------------------
-
+W = FlightData.Inertial.g * FlightData.Inertial.m;
 
 % ---------------------------------------------------------
 % 2. Make initial guesses for trim variables
@@ -17,7 +17,7 @@ DtTrim    = 0.5;
 DeTrim    = 0;
 
 % Initial trim vector (state variables to solve for)
-XTrim = zeros(1, 12);
+XTrim = [AlphaTrim, DtTrim, DeTrim];
 
 % ---------------------------------------------------------
 % 3. Define solver settings
@@ -25,7 +25,7 @@ XTrim = zeros(1, 12);
 Tol     = 1e-6;        % convergence tolerance
 dXTrim  = 1e-6;         % small perturbation for finite differences
 i       = 0;          % iteration counter
-Error     = 1          % initial error 
+Error     = 1;          % initial error 
 J       = zeros(3, 3);        % Initilise Jacobian
 
 % ---------------------------------------------------------
@@ -33,46 +33,122 @@ J       = zeros(3, 3);        % Initilise Jacobian
 % ---------------------------------------------------------
 while Error > Tol
     
+    q = e2q([0, AlphaTrim + gamma, 0]');
+
     % Build state vector X from current guess
-    X =             % initialise state vector
+    X =  zeros(1, 13);           % initialise state vector
     X(1)  = VelTrim * cos(AlphaTrim);        % u-component
     X(3)  = VelTrim * sin(AlphaTrim);        % w-component
-    X(8)  =         % angle of attack
-    X(12) = -h        % altitude
+    x(7)  = q(1);
+    X(8)  = q(2);
+    X(9)  = q(3);
+    X(10)  = q(4);
+    X(13) = -h;        % altitude
     
     % 4b. Build control vector U
-    U =                 % initialise control vector
-    U(1) =              % throttle
-    U(2) =              % elevator
+    U = zeros(1, 4);                % initialise control vector
+    U(1) = DtTrim;             % throttle
+    U(2) = DeTrim;             % elevator
     
-    % Convert Euler angles to quaternion
-    X = 
     
     % get the state vector rates at current iteration
-    Xdot     = 
+    
+    Xdot = TODO;
 
     % Store the relevant state vector rates for u, v, p
-    XTrimDot =  
+    g = Gravity(W, q);
+    F_b = BodyForces(X, U, FlightData, Xdot);
+    XDot = StateRates(g, X, F_b, FlightData);
+    XTrimDot = [XDot(1), XDot(3), XDot(5)]';
     
     % ---------------------------------------------------------
     % 4c. Numerical Jacobian: perturb each trim variable
     % ---------------------------------------------------------
     
     % Perturb Alpha
-    AlphaPert = XTrim(1,i) + dXTrim;
+    AlphaPert = XTrim(1) + dXTrim;
+    AlphaPertM = XTrim(1) - dXTrim;
     % (rebuild X, U, and evaluate dynamics here...)
+    q_p = e2q([0, AlphaPert + gamma, 0]');
+    q_m = e2q([0, AlphaPertM + gamma, 0]');
+    u_p = VelTrim * cos(AlphaPert);
+    u_m = VelTrim * cos(AlphaPertM);
+    w_p = VelTrim * sin(AlphaPert);
+    w_m = VelTrim * sin(AlphaPertM);
+
+    X_p = [u_p, 0, w_p, 0, 0, 0, q_p(1), q_p(2), q_p(3), q_p(4), 0, 0, -h];
+    X_m = [u_m, 0, w_m, 0, 0, 0, q_m(1), q_m(2), q_m(3), q_m(4), 0, 0, -h];
+
+    g_p = Gravity(W, q_p);
+    F_p = BodyForces(X_p, U, FlightData, Xdot);
+    Xdotp = StateRates(g_p, X_p, F_p, FlightData);
+    XPDot = [Xdotp(1), Xdotp(3), XDXdotpot(5)]';
+    g_m = Gravity(W, q_m);
+    F_m = BodyForces(X_m, U, FlightData, Xdot);
+    Xdotm = StateRates(g_m, X_m, F_m, FlightData);
+    XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
+
+    J(:,1) = (XPDot - XMDot)./(2 * dXTrim);
 
     % J(:,1) = (XTrimDotAlpha - XTrimDot)/dXTrim;
     
     % Perturb Throttle
-    DtPert = XTrim(2,i) + dXTrim;
+    DtPert = XTrim(2) + dXTrim;
+    DtPertM = XTrim(2) - dXTrim;
     % (rebuild X, U, and evaluate dynamics here...)
+    u_p = VelTrim * cos(AlphaTrim);
+    u_m = VelTrim * cos(AlphaTrim);
+    w_p = VelTrim * sin(AlphaTrim);
+    w_m = VelTrim * sin(AlphaTrim);
+
+    X_p = [u_p, 0, w_p, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
+    X_m = [u_m, 0, w_m, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
+    
+    U_p = zeros(1, 4);
+    U_p(1) = DtPert;
+    U_m = zeros(1, 4);
+    U_m(1) = DtPertM;
+
+    g_p = Gravity(W, q);
+    F_p = BodyForces(X_p, U_p, FlightData, Xdot);
+    Xdotp = StateRates(g_p, X_p, F_p, FlightData);
+    XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
+    g_m = Gravity(W, q);
+    F_m = BodyForces(X_m, U_m, FlightData, Xdot);
+    Xdotm = StateRates(g_m, X_m, F_m, FlightData);
+    XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
+
+    J(:,2) = (XPDot - XMDot)./(2 * dXTrim);
 
     % J(:,2) = (XTrimDotDt - XTrimDot)/dXTrim;
     
     % Perturb Elevator
-    DePert = XTrim(3,i) + dXTrim;
+    DePert = XTrim(3) + dXTrim;
+    DePertM = XTrim(3) - dXTrim;
     % (rebuild X, U, and evaluate dynamics here...)
+    u_p = VelTrim * cos(AlphaTrim);
+    u_m = VelTrim * cos(AlphaTrim);
+    w_p = VelTrim * sin(AlphaTrim);
+    w_m = VelTrim * sin(AlphaTrim);
+
+    X_p = [u_p, 0, w_p, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
+    X_m = [u_m, 0, w_m, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
+    
+    U_p = zeros(1, 4);
+    U_p(1) = DePert;
+    U_m = zeros(1, 4);
+    U_m(1) = DePertM;
+
+    g_p = Gravity(W, q);
+    F_p = BodyForces(X_p, U_p, FlightData, Xdot);
+    Xdotp = StateRates(g_p, X_p, F_p, FlightData);
+    XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
+    g_m = Gravity(W, q);
+    F_m = BodyForces(X_m, U_m, FlightData, Xdot);
+    Xdotm = StateRates(g_m, X_m, F_m, FlightData);
+    XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
+
+    J(:,3) = (XPDot - XMDot)./(2 * dXTrim);
 
     % J(:,3) = (XTrimDotDe - XTrimDot)/dXTrim;
     
