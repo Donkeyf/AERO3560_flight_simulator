@@ -12,7 +12,7 @@
 clear; clc; close all;
 
 % Initialise the Flight Data and selected simulation option or manual
-% control option
+% control options
 [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
     Flight_Simulation] = Initialisation();
 
