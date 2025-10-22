@@ -17,7 +17,10 @@ DtTrim    = 0.5;
 DeTrim    = 0;
 
 % Initial trim vector (state variables to solve for)
-XTrim = [AlphaTrim, DtTrim, DeTrim];
+max = 1000;
+XTrim = zeros(3, max);
+
+XDot = zeros(13, 1);
 
 % ---------------------------------------------------------
 % 3. Define solver settings
@@ -43,7 +46,7 @@ while Error > Tol
     X(8)  = q(2);
     X(9)  = q(3);
     X(10)  = q(4);
-    X(13) = -h;        % altitude
+    X(13) = -AltTrim;        % altitude
     
     % 4b. Build control vector U
     U = zeros(1, 4);                % initialise control vector
@@ -53,18 +56,18 @@ while Error > Tol
     
     % get the state vector rates at current iteration
     
-    Xdot = TODO;
+    Xdot = XDot;
 
     % Store the relevant state vector rates for u, v, p
-    g = Gravity(W, q);
     F_b = BodyForces(X, U, FlightData, Xdot);
-    XDot = StateRates(g, X, F_b, FlightData);
+    XDot = StateRates(X, F_b, FlightData);
     XTrimDot = [XDot(1), XDot(3), XDot(5)]';
     
     % ---------------------------------------------------------
     % 4c. Numerical Jacobian: perturb each trim variable
     % ---------------------------------------------------------
-    
+    J = zeros(3, 3);
+
     % Perturb Alpha
     AlphaPert = XTrim(1) + dXTrim;
     AlphaPertM = XTrim(1) - dXTrim;
@@ -76,16 +79,15 @@ while Error > Tol
     w_p = VelTrim * sin(AlphaPert);
     w_m = VelTrim * sin(AlphaPertM);
 
-    X_p = [u_p, 0, w_p, 0, 0, 0, q_p(1), q_p(2), q_p(3), q_p(4), 0, 0, -h];
-    X_m = [u_m, 0, w_m, 0, 0, 0, q_m(1), q_m(2), q_m(3), q_m(4), 0, 0, -h];
+    X_p = [u_p, 0, w_p, 0, 0, 0, q_p(1), q_p(2), q_p(3), q_p(4), 0, 0, -AltTrim];
+    X_m = [u_m, 0, w_m, 0, 0, 0, q_m(1), q_m(2), q_m(3), q_m(4), 0, 0, -AltTrim];
 
-    g_p = Gravity(W, q_p);
+
     F_p = BodyForces(X_p, U, FlightData, Xdot);
-    Xdotp = StateRates(g_p, X_p, F_p, FlightData);
+    Xdotp = StateRates(X_p, F_p, FlightData);
     XPDot = [Xdotp(1), Xdotp(3), XDXdotpot(5)]';
-    g_m = Gravity(W, q_m);
     F_m = BodyForces(X_m, U, FlightData, Xdot);
-    Xdotm = StateRates(g_m, X_m, F_m, FlightData);
+    Xdotm = StateRates(X_m, F_m, FlightData);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
 
     J(:,1) = (XPDot - XMDot)./(2 * dXTrim);
@@ -101,21 +103,20 @@ while Error > Tol
     w_p = VelTrim * sin(AlphaTrim);
     w_m = VelTrim * sin(AlphaTrim);
 
-    X_p = [u_p, 0, w_p, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
-    X_m = [u_m, 0, w_m, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
+    X_p = [u_p, 0, w_p, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -AltTrim];
+    X_m = [u_m, 0, w_m, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -AltTrim];
     
     U_p = zeros(1, 4);
     U_p(1) = DtPert;
     U_m = zeros(1, 4);
     U_m(1) = DtPertM;
 
-    g_p = Gravity(W, q);
+
     F_p = BodyForces(X_p, U_p, FlightData, Xdot);
-    Xdotp = StateRates(g_p, X_p, F_p, FlightData);
+    Xdotp = StateRates(X_p, F_p, FlightData);
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
-    g_m = Gravity(W, q);
     F_m = BodyForces(X_m, U_m, FlightData, Xdot);
-    Xdotm = StateRates(g_m, X_m, F_m, FlightData);
+    Xdotm = StateRates(X_m, F_m, FlightData);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
 
     J(:,2) = (XPDot - XMDot)./(2 * dXTrim);
@@ -131,17 +132,16 @@ while Error > Tol
     w_p = VelTrim * sin(AlphaTrim);
     w_m = VelTrim * sin(AlphaTrim);
 
-    X_p = [u_p, 0, w_p, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
-    X_m = [u_m, 0, w_m, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -h];
+    X_p = [u_p, 0, w_p, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -AltTrim];
+    X_m = [u_m, 0, w_m, 0, 0, 0, q(1), q(2), q(3), q(4), 0, 0, -AltTrim];
     
     U_p = zeros(1, 4);
     U_p(1) = DePert;
     U_m = zeros(1, 4);
     U_m(1) = DePertM;
 
-    g_p = Gravity(W, q);
     F_p = BodyForces(X_p, U_p, FlightData, Xdot);
-    Xdotp = StateRates(g_p, X_p, F_p, FlightData);
+    Xdotp = StateRates(X_p, F_p, FlightData);
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
     g_m = Gravity(W, q);
     F_m = BodyForces(X_m, U_m, FlightData, Xdot);
@@ -160,31 +160,37 @@ while Error > Tol
     AlphaTrim = AlphaTrim - d_X(1);
     DtTrim = DtTrim - d_X(2);
     DeTrim = DeTrim - d_X(3);
-    XTrim(:,i+1) = f
+    XTrim(:,i+1) = [AlphaTrim, DtTrim, DeTrim];
     
     % Compute error (the normalised error)
     Error = norm(d_X);
      
     % iterate the counter (may want to include a maximum iteration)
     i = i + 1;
+    if i > max
+        break
+    end
+    
 end
 
 % ---------------------------------------------------------
 % 5. Construct final trimmed state and control vectors
 % ---------------------------------------------------------
-X0 =                % initialise state vector
-U0 =                % initialise control vector
+X0 = zeros(13, 1);             % initialise state vector
+U0 = zeros(4, 1);               % initialise control vector
 
 % Fill in final states
-X0(1)  =            % u-component
-X0(3)  =            % w-component
-X0(8)  =            % angle of attack
-X0(9)  =            % heading angle (rad)
-X0(12) =            % altitude
+X0(1)  = VelTrim * cos(AlphaTrim);        % u-component
+X0(3)  = VelTrim * sin(AlphaTrim);        % w-component
+X0(7)  = q(1);
+X0(8)  = q(2);
+X0(9)  = q(3);
+X0(10)  = q(4);
+X0(13) = -AltTrim;        % altitude
 
 % Fill in controls
-U0(1) =             % throttle
-U0(2) =             % elevator
+U0(1) = DtTrim;            % throttle
+U0(2) = DeTrim;            % elevator
 
 end
 
