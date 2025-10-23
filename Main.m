@@ -41,7 +41,7 @@ U(:,1) = U_input_trim;      % Initial control input now trimmed
 
 % Loop through simulation
 for i = 2: length(time)
-    % U_temp = Control (U_0_trim, time(i), U_input, T_input); % Check Control
+    % U_temp = Controls(i, U_input); % Check Control
     % Integrate at this time step to get new state vector
     % X(:,i) = Integrate(Flight_Data, X(:,i-1), U_temp, dt);
     % U(:,i) = U-temp;
