@@ -1,4 +1,4 @@
-function [X0,U0] = Trim_Scaffold(VelTrim,AltTrim,PsiTrim, FlightData)
+function [X0,U0] = Trim(VelTrim,AltTrim,PsiTrim, FlightData)
 % TRIM - Computes the trim state and control inputs for steady flight.
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
@@ -36,7 +36,7 @@ J       = zeros(3, 3);        % Initilise Jacobian
 % ---------------------------------------------------------
 while Error > Tol
     
-    q = e2q([0, AlphaTrim + gamma, 0]');
+    q = e2q([0, AlphaTrim + PsiTrim, 0]');
 
     % Build state vector X from current guess
     X =  zeros(1, 13);           % initialise state vector
@@ -66,14 +66,13 @@ while Error > Tol
     % ---------------------------------------------------------
     % 4c. Numerical Jacobian: perturb each trim variable
     % ---------------------------------------------------------
-    J = zeros(3, 3);
 
     % Perturb Alpha
     AlphaPert = XTrim(1) + dXTrim;
     AlphaPertM = XTrim(1) - dXTrim;
     % (rebuild X, U, and evaluate dynamics here...)
-    q_p = e2q([0, AlphaPert + gamma, 0]');
-    q_m = e2q([0, AlphaPertM + gamma, 0]');
+    q_p = e2q([0, AlphaPert + PsiTrim, 0]');
+    q_m = e2q([0, AlphaPertM + PsiTrim, 0]');
     u_p = VelTrim * cos(AlphaPert);
     u_m = VelTrim * cos(AlphaPertM);
     w_p = VelTrim * sin(AlphaPert);
@@ -85,7 +84,7 @@ while Error > Tol
 
     F_p = BodyForces(X_p, U, FlightData, Xdot);
     Xdotp = StateRates(X_p, F_p, FlightData);
-    XPDot = [Xdotp(1), Xdotp(3), XDXdotpot(5)]';
+    XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
     F_m = BodyForces(X_m, U, FlightData, Xdot);
     Xdotm = StateRates(X_m, F_m, FlightData);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
@@ -143,9 +142,8 @@ while Error > Tol
     F_p = BodyForces(X_p, U_p, FlightData, Xdot);
     Xdotp = StateRates(X_p, F_p, FlightData);
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
-    g_m = Gravity(W, q);
     F_m = BodyForces(X_m, U_m, FlightData, Xdot);
-    Xdotm = StateRates(g_m, X_m, F_m, FlightData);
+    Xdotm = StateRates(X_m, F_m, FlightData);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
   
     J(:,3) = (XPDot - XMDot)./(2 * dXTrim);

@@ -29,11 +29,6 @@ e = q2e(X(7:10)');
 phi = e(1);
 theta = e(2);
 
-% positions
-x_e = X(11);
-y_e = X(12);
-z_e = X(13);
-
 % DCM from earth to body
 F_g = Gravity(W, X(7:10)');
 C_be = DCM(X(7:10)');
@@ -41,7 +36,7 @@ F_gb = C_be * F_g;
 
 Fx = F_b(1, 1) + F_gb(1);
 Fy = F_b(2, 1) + F_gb(2);
-Fy = F_b(3, 1) + F_gb(3);
+Fz = F_b(3, 1) + F_gb(3);
 L = F_b(1, 2);
 M = F_b(2, 2);
 N = F_b(3, 2);
@@ -77,7 +72,6 @@ q3_dot = -0.5 * (q2 * p - q1 * q - q0 * r);
 % position rate
 C_eb = C_be';
 pos_e = C_eb * [u, v, w]';
-
 xe_dot = pos_e(1); 
 ye_dot = pos_e(2); 
 ze_dot = pos_e(3); 
