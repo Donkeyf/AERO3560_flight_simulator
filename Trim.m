@@ -36,7 +36,7 @@ J       = zeros(3, 3);        % Initilise Jacobian
 % ---------------------------------------------------------
 while Error > Tol
     
-    q = e2q([0, AlphaTrim + PsiTrim, 0]');
+    q = e2q([0, AlphaTrim, 0]');
 
     % Build state vector X from current guess
     X =  zeros(1, 13);           % initialise state vector
