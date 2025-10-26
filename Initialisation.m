@@ -17,7 +17,7 @@
 
 % Group: Wingtip Warriors
 
-function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
+function [Flight_Data, X_0, X0, U_input, T_input, Flight_Condition, ...
     Flight_Simulation] = Initialisation()
 
     % File folder for aircraft data
@@ -47,6 +47,7 @@ function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
 
     % Convert euler angles to quaternions and display results for checking
     disp (State_Vector.X0);
+    X0 = State_Vector.X0;
     quaternion = e2q(State_Vector.X0(7:9));
     disp (quaternion);
     X_0 = [State_Vector.X0(1:6); quaternion; State_Vector.X0(10:12)];
@@ -86,8 +87,8 @@ function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
 
         case 5
             data = load('Simulations/3.5g_loop_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            U_input = data.U_filter;
+            T_input = data.T_filter;
             Flight_Condition = 2;
             Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
             % High speed nominal condition selected
@@ -95,8 +96,8 @@ function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
 
         case 6
             data = load('Simulations/2g_turn_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            U_input = data.U_filter;
+            T_input = data.T_filter;
             Flight_Condition = 2;
             Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
             % High speed nominal condition selected
@@ -104,8 +105,8 @@ function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
 
         case 7
             data = load('Simulations/5deg_sideslip_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            U_input = data.U_filter;
+            T_input = data.T_filter;
             Flight_Condition = 2;
             Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
             % High speed nominal condition selected
@@ -113,8 +114,8 @@ function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
 
         case 8
             data = load('Simulations/4point_hesitation_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            U_input = data.U_filter;
+            T_input = data.T_filter;
             Flight_Condition = 2;
             Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
             % High speed nominal condition selected
@@ -122,8 +123,8 @@ function [Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
 
         case 9
             data = load('Simulations/barrel_roll_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            U_input = data.U_filter;
+            T_input = data.T_filter;
             Flight_Condition = 2;
             Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
             % High speed nominal condition selected

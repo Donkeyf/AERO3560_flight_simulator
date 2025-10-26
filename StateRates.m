@@ -1,11 +1,11 @@
-function Xdot = StateRates(X, F_b, FlightData)
-Ixx = FlightData.Inertial.Ixx;
-Iyy = FlightData.Inertial.Iyy;
-Izz = FlightData.Inertial.Izz;
-Ixz = FlightData.Inertial.Ixz;
+function Xdot = StateRates(W, X, F_b, Flight_Data)
+Ixx = Flight_Data.Inertial.Ixx;
+Iyy = Flight_Data.Inertial.Iyy;
+Izz = Flight_Data.Inertial.Izz;
+Ixz = Flight_Data.Inertial.Ixz;
 
-m = FlightData.Inertial.m;
-g = FlightData.Inertial.g;
+m = Flight_Data.Inertial.m;
+g = Flight_Data.Inertial.g;
 
 % state variables
 % velocitie rate
@@ -29,17 +29,22 @@ e = q2e(X(7:10)');
 phi = e(1);
 theta = e(2);
 
+% positions
+x_e = X(11);
+y_e = X(12);
+z_e = X(13);
+
 % DCM from earth to body
-F_g = Gravity(W, X(7:10)');
+F_g = Gravity(W, X(7:10)', Flight_Data);
 C_be = DCM(X(7:10)');
 F_gb = C_be * F_g;
 
 Fx = F_b(1, 1) + F_gb(1);
 Fy = F_b(2, 1) + F_gb(2);
-Fz = F_b(3, 1) + F_gb(3);
-L = F_b(1, 2);
-M = F_b(2, 2);
-N = F_b(3, 2);
+Fz = F_b(3, 1) + F_gb(3);           % Changed Fy to 'Fz' (CLW)
+L = F_b(1, 1);                      % Changed index in position 2 to '1' (CLW)
+M = F_b(2, 1);                      % Changed index in position 2 to '1' (CLW)
+N = F_b(3, 1);                      % Changed index in position 2 to '1' (CLW)
 
 % velocities
 u_dot = r * v - q * w - g * sin(theta) + Fx/m;
@@ -72,6 +77,7 @@ q3_dot = -0.5 * (q2 * p - q1 * q - q0 * r);
 % position rate
 C_eb = C_be';
 pos_e = C_eb * [u, v, w]';
+
 xe_dot = pos_e(1); 
 ye_dot = pos_e(2); 
 ze_dot = pos_e(3); 

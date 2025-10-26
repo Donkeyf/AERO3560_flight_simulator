@@ -46,15 +46,15 @@ function [Forces_b, Moments_b] = BodyForces(x, U, Flight_Data, xDot)
     A = Flight_Data.Aero;
 
     % Resolve naming variations once (CL0 vs CLo, CD0 vs CDo, CY* vs Cy*)
-    CL0 = iff(isfield(A,'CL0'), A.CL0, iff(isfield(A,'CLo'), A.CLo, 0));
-    CD0 = iff(isfield(A,'CD0'), A.CD0, iff(isfield(A,'CDo'), A.CDo, 0));
+    CL0 = iff(isfield(A,'CLo'), A.CLo, iff(isfield(A,'CLo'), A.CLo, 0));
+    CD0 = iff(isfield(A,'Cdo'), A.Cdo, iff(isfield(A,'Cdo'), A.Cdo, 0));
 
-    CYb  = iff(isfield(A,'CYb'),  A.CYb,  iff(isfield(A,'Cyb'),  A.Cyb,  0));
-    CYbd = iff(isfield(A,'CYbd'), A.CYbd, iff(isfield(A,'Cybd'), A.Cybd, 0));
-    CYr  = iff(isfield(A,'CYr'),  A.CYr,  iff(isfield(A,'Cyr'),  A.Cyr,  0));
-    CYp  = iff(isfield(A,'CYp'),  A.CYp,  iff(isfield(A,'Cyp'),  A.Cyp,  0));
-    CYda = iff(isfield(A,'CYda'), A.CYda, iff(isfield(A,'Cyda'), A.Cyda, 0));
-    CYdr = iff(isfield(A,'CYdr'), A.CYdr, iff(isfield(A,'Cydr'), A.Cydr, 0));
+    CYb  = iff(isfield(A,'Cyb'),  A.Cyb,  iff(isfield(A,'Cyb'),  A.Cyb,  0));
+    CYbd = iff(isfield(A,'Cybd'), A.Cybd, iff(isfield(A,'Cybd'), A.Cybd, 0));
+    CYr  = iff(isfield(A,'Cyr'),  A.Cyr,  iff(isfield(A,'Cyr'),  A.Cyr,  0));
+    CYp  = iff(isfield(A,'Cyp'),  A.Cyp,  iff(isfield(A,'Cyp'),  A.Cyp,  0));
+    CYda = iff(isfield(A,'Cyda'), A.Cyda, iff(isfield(A,'Cyda'), A.Cyda, 0));
+    CYdr = iff(isfield(A,'Cydr'), A.Cydr, iff(isfield(A,'Cydr'), A.Cydr, 0));
 
     % Lift and drag (wind/stability axes)
     % CL = CL0 + CLa*alpha + CLad*alphaDot + CLq*q_bar + CLde*de
@@ -79,12 +79,13 @@ function [Forces_b, Moments_b] = BodyForces(x, U, Flight_Data, xDot)
     % Rotate wind → body: C_y(alpha) then C_z(beta)
     T_wb = C_y(alpha) * C_z(beta);
     Forces_b = T_wb * F_w;                    % [Fx; Fy; Fz] body axes
+    disp(Forces_b);
 
     % Rolling, pitching, yawing moment coefficients (body axes)
     % Use typical field names; if your loader uses different, add fields.
-    Cl0 = iff(isfield(A,'Cl0'), A.Cl0, 0);
-    Cm0 = iff(isfield(A,'Cm0'), A.Cm0, 0);
-    Cn0 = iff(isfield(A,'Cn0'), A.Cn0, 0);
+    Cl0 = iff(isfield(A,'CLo'), A.CLo, 0);
+    Cm0 = iff(isfield(A,'Cmo'), A.Cmo, 0);
+    % Cn0 = iff(isfield(A,'Cno'), A.Cno, 0);  % No such coeff (CLW)
 
     Cl = Cl0 ...
        + A.Clb  * beta ...
@@ -100,7 +101,7 @@ function [Forces_b, Moments_b] = BodyForces(x, U, Flight_Data, xDot)
        + A.Cmq  * q_bar ...
        + A.Cmde * de;
 
-    Cn = Cn0 ...
+    Cn =  ...                            % 'Cno' deleted here(CLW)
        + A.Cnb  * beta ...
        + A.Cnbd * betaDot ...
        + A.Cnr  * r_bar ...

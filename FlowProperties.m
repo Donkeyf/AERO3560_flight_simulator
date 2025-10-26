@@ -7,7 +7,7 @@ function [rho, Q] = FlowProperties(X,Flight_Data)
     P_sls = 101325;                         % Pa - Sea Level Pressure
     T_sls = 288.15;                         % K - Sea Level Temperature
     L = -6.5/1000;                          % K/m - Lapse Rate
-    g = Flight_Data.g;                      % m/s^2 - Gravity Acceleration
+    g = Flight_Data.Inertial.g;                      % m/s^2 - Gravity Acceleration
 
     T = T_sls + L*h;
     P = P_sls*(1 + (L/T_sls)*h)^(-g/(R*L));

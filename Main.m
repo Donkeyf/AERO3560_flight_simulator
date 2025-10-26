@@ -11,13 +11,26 @@
 % Clear the workspace, command window and close all figures
 clear; clc; close all;
 
+% Open the graphical user interface
+% File folder for Control GUI
+%    addpath('Control GUI/__MACOSX/Control_GUI_updated_AB24/');
+%    varargout = Control_GUI_full(varargin);
+
 % Initialise the Flight Data and selected simulation option or manual
-% control options
-[Flight_Data, X_0, U_input, T_input, Flight_Condition, ...
+% control option
+[Flight_Data, X_0, X0, U_input, T_input, Flight_Condition, ...
     Flight_Simulation] = Initialisation();
+disp(X_0);
 
 % Trim aircraft
-% [X_0_trim, U_input_trim] = Trim(Flight_Data, X_0);
+% Extract required data VelTrim, AltTrim and PsiTrim from X0
+VelTrim = sqrt(X0(1)^2 + X0(2)^2 + X0(3)^2);
+AltTrim = X0(12);
+PsiTrim = X0(9);
+
+% Trim aircraft
+[X_0_trim, U_input_trim] = Trim(VelTrim,AltTrim,PsiTrim,Flight_Data);
+disp(X_0_trim);
 
 % Add path to file folder
 % addpath('AircraftData');
@@ -41,10 +54,10 @@ U(:,1) = U_input_trim;      % Initial control input now trimmed
 
 % Loop through simulation
 for i = 2: length(time)
-    % U_temp = Controls(i, U_input); % Check Control
+    U_temp = Controls (time(i), U(i-1),  U_input, T_input); % Check Control
     % Integrate at this time step to get new state vector
-    % X(:,i) = Integrate(Flight_Data, X(:,i-1), U_temp, dt);
-    % U(:,i) = U-temp;
+    X(:,i) = Integrate(Flight_Data, X(:,i-1), U_temp, time(i), dt);
+    U(:,i) = U-temp;
 end
 
 % Copy results from the integration into matrices for plotting
