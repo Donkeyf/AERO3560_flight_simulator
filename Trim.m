@@ -1,9 +1,9 @@
-function [X0,U0] = Trim(VelTrim,AltTrim,PsiTrim, FlightData)
+function [X0,U0] = Trim(VelTrim,AltTrim,PsiTrim, Flight_Data)
 % TRIM - Computes the trim state and control inputs for steady flight.
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
 % ---------------------------------------------------------
-W = FlightData.Inertial.g * FlightData.Inertial.m;
+W = Flight_Data.Inertial.g * Flight_Data.Inertial.m;
 
 % ---------------------------------------------------------
 % 2. Make initial guesses for trim variables
@@ -59,8 +59,8 @@ while Error > Tol
     Xdot = XDot;
 
     % Store the relevant state vector rates for u, v, p
-    F_b = BodyForces(X, U, FlightData, Xdot);
-    XDot = StateRates(X, F_b, FlightData);
+    F_b = BodyForces(X, U, Flight_Data, Xdot);
+    XDot = StateRates(X, F_b, Flight_Data);
     XTrimDot = [XDot(1), XDot(3), XDot(5)]';
     
     % ---------------------------------------------------------
@@ -82,11 +82,11 @@ while Error > Tol
     X_m = [u_m, 0, w_m, 0, 0, 0, q_m(1), q_m(2), q_m(3), q_m(4), 0, 0, -AltTrim];
 
 
-    F_p = BodyForces(X_p, U, FlightData, Xdot);
-    Xdotp = StateRates(X_p, F_p, FlightData);
+    F_p = BodyForces(X_p, U, Flight_Data, Xdot);
+    Xdotp = StateRates(X_p, F_p, Flight_Data);
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
-    F_m = BodyForces(X_m, U, FlightData, Xdot);
-    Xdotm = StateRates(X_m, F_m, FlightData);
+    F_m = BodyForces(X_m, U, Flight_Data, Xdot);
+    Xdotm = StateRates(X_m, F_m, Flight_Data);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
 
     J(:,1) = (XPDot - XMDot)./(2 * dXTrim);
@@ -111,11 +111,11 @@ while Error > Tol
     U_m(1) = DtPertM;
 
 
-    F_p = BodyForces(X_p, U_p, FlightData, Xdot);
-    Xdotp = StateRates(X_p, F_p, FlightData);
+    F_p = BodyForces(X_p, U_p, Flight_Data, Xdot);
+    Xdotp = StateRates(X_p, F_p, Flight_Data);
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
-    F_m = BodyForces(X_m, U_m, FlightData, Xdot);
-    Xdotm = StateRates(X_m, F_m, FlightData);
+    F_m = BodyForces(X_m, U_m, Flight_Data, Xdot);
+    Xdotm = StateRates(X_m, F_m, Flight_Data);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
 
     J(:,2) = (XPDot - XMDot)./(2 * dXTrim);
@@ -139,11 +139,11 @@ while Error > Tol
     U_m = zeros(1, 4);
     U_m(1) = DePertM;
 
-    F_p = BodyForces(X_p, U_p, FlightData, Xdot);
-    Xdotp = StateRates(X_p, F_p, FlightData);
+    F_p = BodyForces(X_p, U_p, Flight_Data, Xdot);
+    Xdotp = StateRates(X_p, F_p, Flight_Data);
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
-    F_m = BodyForces(X_m, U_m, FlightData, Xdot);
-    Xdotm = StateRates(X_m, F_m, FlightData);
+    F_m = BodyForces(X_m, U_m, Flight_Data, Xdot);
+    Xdotm = StateRates(X_m, F_m, Flight_Data);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
   
     J(:,3) = (XPDot - XMDot)./(2 * dXTrim);
