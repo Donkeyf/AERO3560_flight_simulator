@@ -1,4 +1,5 @@
 function [X0,U0] = Trim(VelTrim,AltTrim,PsiTrim, Flight_Data)
+% function [X0,U0] = Trim(FlightData, X)
 % TRIM - Computes the trim state and control inputs for steady flight.
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
@@ -27,6 +28,7 @@ XDot = zeros(13, 1);
 % ---------------------------------------------------------
 Tol     = 1e-6;        % convergence tolerance
 dXTrim  = 1e-6;         % small perturbation for finite differences
+% gamma = dXTrim;         % small perturbation (CLW add)
 i       = 0;          % iteration counter
 Error     = 1;          % initial error 
 J       = zeros(3, 3);        % Initilise Jacobian
@@ -36,13 +38,13 @@ J       = zeros(3, 3);        % Initilise Jacobian
 % ---------------------------------------------------------
 while Error > Tol
     
-    q = e2q([0, AlphaTrim, 0]');
+    q = e2q([0, AlphaTrim, 0]');            % delete '+ gamma' (CLW)
 
     % Build state vector X from current guess
     X =  zeros(1, 13);           % initialise state vector
     X(1)  = VelTrim * cos(AlphaTrim);        % u-component
     X(3)  = VelTrim * sin(AlphaTrim);        % w-component
-    x(7)  = q(1);
+    X(7)  = q(1);
     X(8)  = q(2);
     X(9)  = q(3);
     X(10)  = q(4);
@@ -60,12 +62,13 @@ while Error > Tol
 
     % Store the relevant state vector rates for u, v, p
     F_b = BodyForces(X, U, Flight_Data, Xdot);
-    XDot = StateRates(X, F_b, Flight_Data);
+    XDot = StateRates(W, X, F_b, Flight_Data);
     XTrimDot = [XDot(1), XDot(3), XDot(5)]';
     
     % ---------------------------------------------------------
     % 4c. Numerical Jacobian: perturb each trim variable
     % ---------------------------------------------------------
+    % J = zeros(3, 3);
 
     % Perturb Alpha
     AlphaPert = XTrim(1) + dXTrim;
@@ -83,10 +86,10 @@ while Error > Tol
 
 
     F_p = BodyForces(X_p, U, Flight_Data, Xdot);
-    Xdotp = StateRates(X_p, F_p, Flight_Data);
-    XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
+    Xdotp = StateRates(W, X_p, F_p, Flight_Data);           % Added 'W' (CLW)
+    XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';              % Removed 'ot' (CLW)
     F_m = BodyForces(X_m, U, Flight_Data, Xdot);
-    Xdotm = StateRates(X_m, F_m, Flight_Data);
+    Xdotm = StateRates(W, X_m, F_m, Flight_Data);           % Added 'W' (CLW)
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
 
     J(:,1) = (XPDot - XMDot)./(2 * dXTrim);
@@ -112,10 +115,10 @@ while Error > Tol
 
 
     F_p = BodyForces(X_p, U_p, Flight_Data, Xdot);
-    Xdotp = StateRates(X_p, F_p, Flight_Data);
+    Xdotp = StateRates(W, X_p, F_p, Flight_Data);           % Added 'W' (CLW)
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
     F_m = BodyForces(X_m, U_m, Flight_Data, Xdot);
-    Xdotm = StateRates(X_m, F_m, Flight_Data);
+    Xdotm = StateRates(W, X_m, F_m, Flight_Data);           % Added 'W' (CLW)
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
 
     J(:,2) = (XPDot - XMDot)./(2 * dXTrim);
@@ -140,10 +143,11 @@ while Error > Tol
     U_m(1) = DePertM;
 
     F_p = BodyForces(X_p, U_p, Flight_Data, Xdot);
-    Xdotp = StateRates(X_p, F_p, Flight_Data);
+    Xdotp = StateRates(W, X_p, F_p, Flight_Data);           % Added 'W' (CLW)
     XPDot = [Xdotp(1), Xdotp(3), Xdotp(5)]';
+    g_m = Gravity(W, X, Flight_Data);                       % (W, q); (CLW)
     F_m = BodyForces(X_m, U_m, Flight_Data, Xdot);
-    Xdotm = StateRates(X_m, F_m, Flight_Data);
+    Xdotm = StateRates(g_m, X_m, F_m, Flight_Data);
     XMDot = [Xdotm(1), Xdotm(3), Xdotm(5)]';
   
     J(:,3) = (XPDot - XMDot)./(2 * dXTrim);
