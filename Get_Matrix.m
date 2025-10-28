@@ -2,17 +2,17 @@ function mat_struct = Get_Matrix(FlightData, lon_struct, IC)
     mat_struct.A_Lon = lon_struct.A_Lon;
     mat_struct.B_Lon = lon_struct.B_Lon;
     
-    S = FlightData.geo.S;
-    c = FlightData.geo.c;
-    b = FlightData.geo.b;
+    S = FlightData.Geo.S;
+    c = FlightData.Geo.c;
+    b = FlightData.Geo.b;
 
     g = FlightData.Inertial.g;
-    FlightData.Inertial.m
+    m = FlightData.Inertial.m;
 
-    Ixx = Flight_Data.Inertial.Ixx;
-    Iyy = Flight_Data.Inertial.Iyy;
-    Izz = Flight_Data.Inertial.Izz;
-    Ixz = Flight_Data.Inertial.Ixz;
+    Ixx = FlightData.Inertial.Ixx;
+    Iyy = FlightData.Inertial.Iyy;
+    Izz = FlightData.Inertial.Izz;
+    Ixz = FlightData.Inertial.Ixz;
 
 
     X0 = IC.X0;
