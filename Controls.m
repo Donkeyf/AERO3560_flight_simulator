@@ -25,23 +25,35 @@ function [U, t] = Controls()
     switch Flight_Simulation
         case 1
             data = load('Simulations/SteadyLevel_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = 1;
 
         case 2
             data = load('Simulations/Elevator_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = 1;
 
         case 3
             data = load('Simulations/Aileron_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = 1;
  
         case 4
             data = load('Simulations/Rudder_U_input.mat');
-            U_input = data.U_linear;
-            T_input = data.T_linear;
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = 1;
 
         case 5
             data = load('Simulations/3.5g_loop_U_input.mat');

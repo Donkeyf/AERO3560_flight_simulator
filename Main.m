@@ -16,9 +16,12 @@ clear; clc; close all;
 %    addpath('Control GUI/__MACOSX/Control_GUI_updated_AB24/');
 %    varargout = Control_GUI_full(varargin);
 
-% Initialise the Flight Data and selected simulation option or manual
-% control option
+% Initialise the Flight Data 
 [Flight_Data, X_0, X0] = Initialisation();
+
+% Select Manoeuvre to Perform
+[U, time] = Controls();
+
 % 
 % % Trim aircraft
 % % Extract required data VelTrim, AltTrim and PsiTrim from X0
