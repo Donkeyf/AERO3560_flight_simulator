@@ -50,9 +50,14 @@ while Error > Tol && iter < max
     X(1)  = V * cos(AlphaTrim);        % u-component
     X(2)  = V * sin(-beta);            % v-component
     X(3)  = V * sin(AlphaTrim);        % w-component
+    X(7)  = q(1);
+    X(8)  = q(2);
+    X(9)  = q(3);
+    X(10)  = q(4);
+    X(13) = -AltTrim;        % altitude
     
     % 4b. Build control vector U
-    U = zeros(1, 4);           % initialise control vector
+    U = zeros(1, 4);                % initialise control vector
     U(1) = DtTrim;             % throttle
     U(2) = DeTrim;             % elevator
     
