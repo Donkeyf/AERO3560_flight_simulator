@@ -1,19 +1,13 @@
 % Function Initialisation
 % This function asks user to select one of four flight configurations,
-% followed by asking user to select one of 8 control input sets or a
-% further two options, option 1, straight and level, to check that the trim
-% function is working, or Option 10, direct control entry for the graphical
-% user interface.
+% loading all of the required to simulate the flight of the aircraft -
+% inertial and geometric properties, engine power and aerodynamic
+% coefficients.
 
 % Initialisation.m will extract the following outputs from AircraftData
 % Flight_Data which includes aircraft specifications and control
 % coefficients and other flight control parameters.
-% X_0, the initial state vector.
-% Extract GUI generated control inputs from Simulations
-% U_input which is the user selected control input.
-% T_input which is the time vector corresponding to the control input.
-% Flight_Condition: one of four flight conditions (AircraftData)
-% Flight_Simulation: one of 10 flight simulations (Simulations)
+% X0 & X_0, the initial state vector with Euler Angles & quaternions.
 
 % Group: Wingtip Warriors
 
