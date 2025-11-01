@@ -29,7 +29,7 @@ function [U, t] = Controls()
             dt = data.GUI_save.TimeStep;
             nt = tf/dt + 1;
             t = linspace(0,tf,nt);
-            U = 1;
+            U = extract_control_vector(data,t);
 
         case 2
             data = load('Simulations/Elevator_U_input.mat');
@@ -37,7 +37,7 @@ function [U, t] = Controls()
             dt = data.GUI_save.TimeStep;
             nt = tf/dt + 1;
             t = linspace(0,tf,nt);
-            U = 1;
+            U = extract_control_vector(data,t);
 
         case 3
             data = load('Simulations/Aileron_U_input.mat');
@@ -45,15 +45,15 @@ function [U, t] = Controls()
             dt = data.GUI_save.TimeStep;
             nt = tf/dt + 1;
             t = linspace(0,tf,nt);
-            U = 1;
- 
+            U = extract_control_vector(data,t);
+
         case 4
             data = load('Simulations/Rudder_U_input.mat');
             tf = data.GUI_save.SimTime;
             dt = data.GUI_save.TimeStep;
             nt = tf/dt + 1;
             t = linspace(0,tf,nt);
-            U = 1;
+            U = extract_control_vector(data,t);
 
         case 5
             data = load('Simulations/3.5g_loop_U_input.mat');
@@ -104,3 +104,25 @@ function [U, t] = Controls()
     end
 end
 
+function [u] = extract_control_vector(data,time)
+
+    % Extracting Known Control Data Points & Times
+    throttle_times = data.GUI_save.X_dt;
+    throttle_inputs = data.GUI_save.Y_dt;
+    el_times = data.GUI_save.X_de;
+    el_defs = data.GUI_save.Y_de;
+    ail_times = data.GUI_save.X_da;
+    ail_defs = data.GUI_save.Y_da;
+    rud_times = data.GUI_save.X_dr;
+    rud_defs = data.GUI_save.Y_dr;
+
+    % Interpolating Controls for the Manoeuvre
+    dt = interp1(throttle_times,throttle_inputs,time);
+    de = interp1(el_times,el_defs,time);
+    da = interp1(ail_times,ail_defs,time);
+    dr = interp1(rud_times,rud_defs,time);
+
+    % Constructing Manouevre Control Array
+    u = [dt; de; da; dr];
+
+end
