@@ -10,68 +10,85 @@
 % Instructions to the user: This function is called inside the time loop
 % in Main.m. Ensure Initialisation.m has loaded U_input and T_input.
 
-function U_t = Controls(t, U_trim, U_input, T_input, opts)
+function [U, t] = Controls()
+    % Select simulation choice: Present choice to the user
+    simulation_selection = {'Trimmed flight check', ...
+        '0.5 second 5deg elevator impulse', '0.5 second 5deg aileron impulse',...
+        '0.5 second 5deg rudder impulse', '3.5g loop and return to level flight',...
+        '2g zero sideslip turn', 'Steady-heading with sideslip 5deg', ...
+        '4 point hesitation roll', 'Barrel roll'};
 
-    % Defaults for optional settings
-    if nargin < 5, opts = struct(); end
-    if ~isfield(opts, 'units'),       opts.units = 'deg';  end     % 'deg' or 'rad' for E/A/R
-    if ~isfield(opts, 'asDelta'),     opts.asDelta = true; end     % true → add to trim
-    if ~isfield(opts, 'holdLast'),    opts.holdLast = false; end   % false → zero outside window
-    if ~isfield(opts, 'saturations'), opts.saturations = [0 1; -inf inf; -inf inf; -inf inf]; end
+    [Flight_Simulation, ok] = listdlg ('PromptString','Make a selection:', ...
+        'SelectionMode','single', 'ListString', simulation_selection);
 
-    % If no schedule is provided, hold trim
-    if isempty(U_input) || isempty(T_input)
-        U_t = U_trim(:);
-        return
-    end
+    % Simulation selection and U control vector
+    switch Flight_Simulation
+        case 1
+            data = load('Simulations/SteadyLevel_U_input.mat');
+            U_input = data.U_linear;
+            T_input = data.T_linear;
 
-    Us = U_input(1:4,:) + U_trim;               % added by CLW)
+        case 2
+            data = load('Simulations/Elevator_U_input.mat');
+            U_input = data.U_linear;
+            T_input = data.T_linear;
 
-    % Make schedule 4xN; time as 1xN            % U_input is  5 by x cols
-    % if size(U_input,1) == 4
-    %    Us = U_input;
-    % elseif size(U_input,2) == 4
-    %     Us = U_input.';                % Nx4 → 4xN
-    % else
-    %     error('U_input must be 4xN or Nx4 with columns [thr elev ail rud].');
-    % end
-    T = T_input(:).';
+        case 3
+            data = load('Simulations/Aileron_U_input.mat');
+            U_input = data.U_linear;
+            T_input = data.T_linear;
+ 
+        case 4
+            data = load('Simulations/Rudder_U_input.mat');
+            U_input = data.U_linear;
+            T_input = data.T_linear;
 
-    % Sort by time in case the file is unordered
-    [T, idx] = sort(T, 'ascend');
-    Us = Us(:, idx);
+        case 5
+            data = load('Simulations/3.5g_loop_U_input.mat');
+            U_input = data.U_filter;
+            T_input = data.T_filter;
+            Flight_Condition = 2;
+            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
+            % High speed nominal condition selected
+            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
 
-    % Convert elevator/aileron/rudder if schedules are in degrees % (CLW)
-    % if strcmpi(opts.units, 'deg')
-    %     Us(2:4, :) = deg2rad(Us(2:4, :));   % throttle untouched
-    % elseif ~strcmpi(opts.units, 'rad')
-    %    error('opts.units must be ''deg'' or ''rad''.');
-    % end
+        case 6
+            data = load('Simulations/2g_turn_U_input.mat');
+            U_input = data.U_filter;
+            T_input = data.T_filter;
+            Flight_Condition = 2;
+            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
+            % High speed nominal condition selected
+            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
 
-    % Interpolate the schedule at time t
-    if opts.holdLast
-        % Zero-order hold with clamping at the ends
-        u = interp1(T, Us.', t, 'previous', 'extrap').';
-        if t < T(1),  u = Us(:,1);  end
-        if t > T(end), u = Us(:,end); end
-    else
-        % Linear interpolation; outside window → zero (delta schedule)
-        u = [interp1(T, Us(1,:), t, 'linear', 0);   % throttle (0..1)
-             interp1(T, Us(2,:), t, 'linear', 0);   % elevator (rad)
-             interp1(T, Us(3,:), t, 'linear', 0);   % aileron  (rad)
-             interp1(T, Us(4,:), t, 'linear', 0)];  % rudder   (rad)
-    end
+        case 7
+            data = load('Simulations/5deg_sideslip_U_input.mat');
+            U_input = data.U_filter;
+            T_input = data.T_filter;
+            Flight_Condition = 2;
+            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
+            % High speed nominal condition selected
+            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
 
-    % Combine with trim (delta vs absolute)
-    if opts.asDelta
-        U_t = U_trim(:) + u;
-    else
-        U_t = u;
-    end
+        case 8
+            data = load('Simulations/4point_hesitation_U_input.mat');
+            U_input = data.U_filter;
+            T_input = data.T_filter;
+            Flight_Condition = 2;
+            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
+            % High speed nominal condition selected
+            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
 
-    % Apply per-channel saturations
-    for k = 1:4
-        U_t(k) = min(max(U_t(k), opts.saturations(k,1)), opts.saturations(k,2));
+        case 9
+            data = load('Simulations/barrel_roll_U_input.mat');
+            U_input = data.U_filter;
+            T_input = data.T_filter;
+            Flight_Condition = 2;
+            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
+            % High speed nominal condition selected
+            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
+
+
     end
 end
 
