@@ -19,7 +19,7 @@ clear; clc; close all;
 % Initialise the Flight Data 
 [Flight_Data, X_0, X0] = Initialisation();
 
-% Select Manoeuvre to Perform
+% Select Manoeuvre to Perform & Generate Control Array
 [U, time] = Controls();
 
 % 

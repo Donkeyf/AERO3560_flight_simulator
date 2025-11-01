@@ -57,48 +57,43 @@ function [U, t] = Controls()
 
         case 5
             data = load('Simulations/3.5g_loop_U_input.mat');
-            U_input = data.U_filter;
-            T_input = data.T_filter;
-            Flight_Condition = 2;
-            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
-            % High speed nominal condition selected
-            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = extract_control_vector(data,t);
 
         case 6
             data = load('Simulations/2g_turn_U_input.mat');
-            U_input = data.U_filter;
-            T_input = data.T_filter;
-            Flight_Condition = 2;
-            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
-            % High speed nominal condition selected
-            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = extract_control_vector(data,t);
 
         case 7
             data = load('Simulations/5deg_sideslip_U_input.mat');
-            U_input = data.U_filter;
-            T_input = data.T_filter;
-            Flight_Condition = 2;
-            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
-            % High speed nominal condition selected
-            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = extract_control_vector(data,t);
 
         case 8
             data = load('Simulations/4point_hesitation_U_input.mat');
-            U_input = data.U_filter;
-            T_input = data.T_filter;
-            Flight_Condition = 2;
-            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
-            % High speed nominal condition selected
-            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = extract_control_vector(data,t);
 
         case 9
             data = load('Simulations/barrel_roll_U_input.mat');
-            U_input = data.U_filter;
-            T_input = data.T_filter;
-            Flight_Condition = 2;
-            Flight_Data = aero3560_LoadFlightDataPC9_nominalCG1();
-            % High speed nominal condition selected
-            State_Vector = load('AircraftData/Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat');
+            tf = data.GUI_save.SimTime;
+            dt = data.GUI_save.TimeStep;
+            nt = tf/dt + 1;
+            t = linspace(0,tf,nt);
+            U = extract_control_vector(data,t);
 
 
     end
