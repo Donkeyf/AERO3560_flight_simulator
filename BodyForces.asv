@@ -17,9 +17,9 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
     r = X(6);
 
     % Extracting control vector deflections
-    de = u(2);
-    da = u(3);
-    dr = u(4);
+    de = u_control(2);
+    da = u_control(3);
+    dr = u_control(4);
 
     % Compute velocity, angle of attack and sideslip angle from velocity
     % components
@@ -27,8 +27,8 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
     [alpha_dot, beta_dot] = AngularRates(X, XDot);
 
     % Non-dimensionalise pitch, roll and yaw rates, as well as angular rates
-    b = Flight_Data.Flight_Data.Geo.b;           % Wing span
-    c_bar = Flight_Data.Flight_Data.Geo.c;       % Mean Chord
+    b = FlightData.Geo.b;           % Wing span
+    c_bar = FlightData.Geo.c;       % Mean Chord
     p_bar = (p*b)/(2*V);            % roll
     q_bar = (q*c_bar)/(2*V);        % pitch
     r_bar = (r*b)/(2*V);            % yaw
@@ -36,20 +36,24 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
     beta_dot = (beta_dot*b)/(2*V);          % Sideslip
 
     % Lift and Drag coefficients
-    [CL, CD] = WindForces(X, u, Flight_Data, XDot);
-    T = PropForces(u, X, Flight_Data);
-    [~, Q] = FlowProperties(Flight_Data, X);
+    [CL, CD] = WindForces(FlightData, X, X_dot, u_control);
+    T = PropForces(FlightData, X, u_control);
+    [~, Q] = FlowProperties(X);
 
     % Thrust force acts purely in x direction
     F_T = T*[1; 0; 0];
 
+    % Aircraft geometric and aerodynamic properties
+    Geo = FlightData.Geo;
+    Aero = FlightData.Aero;
+
     % Sideforce coefficient
-    CY = Flight_Data.Aero.Cyb*beta + Flight_Data.Aero.Cyp*p_bar + Flight_Data.Aero.Cyr*r_bar + Flight_Data.Aero.Cyda*da + Flight_Data.Aero.Cydr*dr + Flight_Data.Aero.Cybd*beta_dot;
+    CY = Aero.Cyb*beta + Aero.Cyp*p_bar + Aero.Cyr*r_bar + Aero.Cyda*da + Aero.Cydr*dr + Aero.Cybd*beta_dot;
 
     % Convert force coefficients to forces
-    L = Q*Flight_Data.Geo.S*CL;
-    D = Q*Flight_Data.Geo.S*CD;
-    Y = Q*Flight_Data.Geo.S*CY;
+    L = Q*Geo.S*CL;
+    D = Q*Geo.S*CD;
+    Y = Q*Geo.S*CY;
 
     % Rotate from stability axes to body axes
     C_bs = C_y(alpha);
@@ -58,14 +62,14 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
     Forces_b = F_T + C_bs*[-D; Y; -L];
 
     % Calculate moment coefficients
-    CM = Flight_Data.Aero.Cmo + Flight_Data.Aero.Cma*alpha + Flight_Data.Aero.Cmq*q_bar + Flight_Data.Aero.Cmad*alpha_dot + Flight_Data.Aero.Cmde*de;
-    CN = Flight_Data.Aero.Cnb*beta + Flight_Data.Aero.Cnp*p_bar + Flight_Data.Aero.Cnr*r_bar + Flight_Data.Aero.Cnda*da + Flight_Data.Aero.Cndr*dr + Flight_Data.Aero.Cnbd*beta_dot;
-    Cl = Flight_Data.Aero.Clb*beta + Flight_Data.Aero.Clp*p_bar + Flight_Data.Aero.Clr*r_bar + Flight_Data.Aero.Clda*da + Flight_Data.Aero.Cldr*dr + Flight_Data.Aero.Clbd*beta_dot;
+    CM = Aero.Cmo + Aero.Cma*alpha + Aero.Cmq*q_bar + Aero.Cmad*alpha_dot + Aero.Cmde*de;
+    CN = Aero.Cnb*beta + Aero.Cnp*p_bar + Aero.Cnr*r_bar + Aero.Cnda*da + Aero.Cndr*dr + Aero.Cnbd*beta_dot;
+    Cl = Aero.Clb*beta + Aero.Clp*p_bar + Aero.Clr*r_bar + Aero.Clda*da + Aero.Cldr*dr + Aero.Clbd*beta_dot;
 
     % Convert moment coefficients to moments
-    M = CM*Q*Flight_Data.Geo.S*Flight_Data.Geo.c;
-    N = CN*Q*Flight_Data.Geo.S*Flight_Data.Geo.b;
-    l = Cl*Q*Flight_Data.Geo.S*Flight_Data.Geo.b;
+    M = CM*Q*Geo.S*Geo.c;
+    N = CN*Q*Geo.S*Geo.b;
+    l = Cl*Q*Geo.S*Geo.b;
 
     % Overall body moment
     Moments_b = [l; M; N];

@@ -21,16 +21,9 @@ clear; clc; close all;
 
 % Select Manoeuvre to Perform & Generate Control Array
 [U, time] = Controls();
-
-% 
+ 
 % % Trim aircraft
-% % Extract required data VelTrim, AltTrim and PsiTrim from X0
-% VelTrim = sqrt(X0(1)^2 + X0(2)^2 + X0(3)^2);
-% AltTrim = X0(12);
-% PsiTrim = X0(9);
-% 
-% % Trim aircraft
-% [X_0_trim, U_input_trim] = Trim(VelTrim,AltTrim,PsiTrim,Flight_Data);
+% [X_0_trim, U_input_trim] = Trim(Flight_Data, X_0);
 % disp(X_0_trim);
 % 
 % % Add path to file folder

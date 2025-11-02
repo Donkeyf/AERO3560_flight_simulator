@@ -30,10 +30,8 @@ function Xdot = StateRates(Flight_Data, X,
         y_e = X(12);
         z_e = X(13);
 
-        % Inertial Coefficients
-        C = inertial_coefficients(Flight_Data);
 
-        
+    end
 
 
 end
@@ -45,7 +43,7 @@ function [C] = inertial_coefficients(Flight_Data)
     Izz = Flight_Data.Inertial.Izz;
     Ixz = Flight_Data.Inertial.Ixz;
 
-    % Inertial coefficients
+    % Inertial coefficient definitions
     C0 = Ixx*Izz - Ixz^2;
     C1 = Izz/C0;
     C2 = Ixz/C0;

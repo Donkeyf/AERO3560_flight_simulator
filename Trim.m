@@ -27,7 +27,7 @@ DtTrim    = 0.5;
 DeTrim    = 0;
 
 % Initial trim vector (state variables to solve for)
-XTrim = zeros(1,3);
+XTrim = X;
 
 % ---------------------------------------------------------
 % 3. Define solver settings
@@ -47,24 +47,17 @@ while Error > Tol && iter < max
     % Build state vector X from current guess
     X =  zeros(1, 13);           % initialise state vector
     V =  norm(X(1:3));
-    X(1)  = V * cos(AlphaTrim);        % u-component
+    X(1)  = V * cos(XTrim(1));        % u-component
     X(2)  = V * sin(-beta);            % v-component
-    X(3)  = V * sin(AlphaTrim);        % w-component
+    X(3)  = V * sin(XTrim(1));        % w-component
     
     % 4b. Build control vector U
     U = zeros(1, 4);           % initialise control vector
     U(1) = DtTrim;             % throttle
     U(2) = DeTrim;             % elevator
-    
-    
-    % get the state vector rates at current iteration
-    
-    Xdot = XDot;
 
-    % Store the relevant state vector rates for u, v, p
-    F_b = BodyForces(X, U, Flight_Data, Xdot);
-    XDot = StateRates(W, X, F_b, Flight_Data);
-    XTrimDot = [XDot(1), XDot(3), XDot(5)]';
+    % Current State Rates
+    XDot = StateRates(Flight_Data, XTrim, )
     
     % ---------------------------------------------------------
     % 4c. Numerical Jacobian: perturb each trim variable

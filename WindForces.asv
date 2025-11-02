@@ -10,9 +10,9 @@
 % Instructions to the user: Call from the force/moment build when
 % FlowProperties.m, AeroAngles.m and AngularRates.m are available.
 % Inputs are state x = [u v w p q r q0 q1 q2 q3 x_e y_e z_e]^T,
-% controls U = [δ_T; δ_e; δ_a; δ_r], Flight_Data with .Geo and .Flight_Data.Aero.
+% controls U = [δ_T; δ_e; δ_a; δ_r], Flight_Data with .Geo and .Aero.
 
-function [C_L, C_D] = WindForces(X, U, Flight_Data, xDot)
+function [Lift, Drag] = WindForces(X, U, Flight_Data, xDot)
     % Extract states from state vector and control vector
     q = X(5);
     de = U(2);
@@ -28,13 +28,13 @@ function [C_L, C_D] = WindForces(X, U, Flight_Data, xDot)
     q_bar = (q*c_bar)/(2*V);               % pitch
     alphaDot = (alphaDot*c_bar)/(2*V);     % AoA
 
-    % Lift Coefficient
-    C_L = Flight_Data.Aero.CLa*alpha +  Flight_Data.Aero.CLq*q_bar + Flight_Data.Aero.CLad*alphaDot +Flight_Data.Aero.CLde*de + Flight_Data.Aero.CLo;
+    % Evaluate lift coefficient
+    CL = Aero.CLa*alpha +  Aero.CLq*q_bar + Aero.CLad*alphaDot +Aero.CLde*de + Aero.CLo;
 
-    % Drag Coefficient 
-    k = Flight_Data.Aero.k;
-    CD0 = Flight_Data.Aero.Cdo;
-    C_D = CD0 + k*CL^2;
+    % Drag coefficient approximation
+    k = Aero.k;
+    CD0 = Aero.Cdo;
+    CD = CD0 + k*CL^2;
 end
 
 

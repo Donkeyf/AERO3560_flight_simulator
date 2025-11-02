@@ -13,38 +13,19 @@
 % [u v w p q r q0 q1 q2 q3 x_e y_e z_e]^T. Units are SI, angles in radians.
 
 function [alphaDot, betaDot] = AngularRates(x, xDot)
+    % Extract velocity components and magnitude
+    u = X(1);
+    v = X(2);
+    w = X(3);
+    V = norm(X(1:3));
 
-    % Guard for missing or empty xDot (fallback to zeros)
-    if nargin < 2 || isempty(xDot)
-        xDot = zeros(size(x));
-    end
+    % Extract acceleration components and magnitude
+    u_dot = X_dot(1);
+    v_dot = X_dot(2);
+    w_dot = X_dot(3);
+    V_dot = norm(X(1:3));
 
-    % Extract body-axis velocities and their derivatives
-    u    = x(1);
-    v    = x(2);
-    w    = x(3);
-    uDot = xDot(1);
-    vDot = xDot(2);
-    wDot = xDot(3);
-
-    % Useful magnitudes with small epsilons to avoid division by zero
-    r_xz = sqrt(u^2 + w^2);           % speed in x–z plane
-    V    = sqrt(u^2 + v^2 + w^2);     % total speed
-    epsR = 1e-8;                      % small number for robustness
-    epsV = 1e-8;
-
-    r_xz_safe = max(r_xz, epsR);
-    V_safe    = max(V,    epsV);
-
-    % Time derivative of alpha = atan2(w, u)
-    % alphaDot = (u*wDot - w*uDot) / (u^2 + w^2)
-    denom_alpha = max(r_xz_safe^2, epsR);
-    alphaDot    = (u*wDot - w*uDot) / denom_alpha;
-
-    % Time derivative of beta = atan2(v, r_xz)
-    % betaDot = (r_xz*vDot - v*r_xzDot) / (r_xz^2 + v^2)  with
-    % r_xzDot = (u*uDot + w*wDot) / r_xz
-    r_xzDot     = (u*uDot + w*wDot) / r_xz_safe;
-    denom_beta  = max(V_safe^2, epsV);              % r_xz^2 + v^2 = V^2
-    betaDot     = (r_xz*vDot - v*r_xzDot) / denom_beta;
+    % Compute rates of change of beta and alpha angles
+    alphaDot = (u*w_dot - w*u_dot)/(u^2 + w^2);                    
+    betaDot = ((v_dot/V)- ((v*V_dot)/V^2))/(sqrt(1- (v^2/V^2)));   
 end
