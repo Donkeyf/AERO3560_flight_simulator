@@ -14,16 +14,16 @@
 
 function [alphaDot, betaDot] = AngularRates(x, xDot)
     % Extract velocity components and magnitude
-    u = X(1);
-    v = X(2);
-    w = X(3);
-    V = norm(X(1:3));
+    u = x(1);
+    v = x(2);
+    w = x(3);
+    V = norm(x(1:3));
 
     % Extract acceleration components and magnitude
-    u_dot = X_dot(1);
-    v_dot = X_dot(2);
-    w_dot = X_dot(3);
-    V_dot = norm(X(1:3));
+    u_dot = xDot(1);
+    v_dot = xDot(2);
+    w_dot = xDot(3);
+    V_dot = norm(xDot(1:3));
 
     % Compute rates of change of beta and alpha angles
     alphaDot = (u*w_dot - w*u_dot)/(u^2 + w^2);                    
