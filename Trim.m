@@ -3,7 +3,7 @@ function [X0,U0] = Trim(Flight_Data, X)
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
 % ---------------------------------------------------------
-[rho, Q] = FlowProperties(Flight_Data, X);
+[~, Q] = FlowProperties(Flight_Data, X);
 
 % ---------------------------------------------------------
 % 2. Make initial guesses for trim variables
@@ -36,7 +36,7 @@ Tol     = 1e-6;               % convergence tolerance
 dXTrim  = 1e-6;               % small perturbation for finite differences
 i       = 1;                  % iteration counter
 Error   = 1;                  % initial error 
-J       = zeros(length(XTrim));        % Initilise Jacobian
+J       = zeros(1,3);         % Initilise Jacobian
 max     = 1000;               % max. number of iterations
 
 % ---------------------------------------------------------
@@ -57,7 +57,7 @@ while Error > Tol && iter < max
     U(2) = DeTrim;             % elevator
 
     % Current State Rates
-    XDot = StateRates(Flight_Data, XTrim, )
+    XDot = StateRates(Flight_Data, XTrim, U);
     
     % ---------------------------------------------------------
     % 4c. Numerical Jacobian: perturb each trim variable

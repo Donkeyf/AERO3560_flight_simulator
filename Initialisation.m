@@ -11,7 +11,7 @@
 
 % Group: Wingtip Warriors
 
-function [Flight_Data, X_0, X0] = Initialisation()
+function [Flight_Data, X0] = Initialisation()
 
     % File folder for aircraft data
     addpath('AircraftData/');
@@ -41,7 +41,7 @@ function [Flight_Data, X_0, X0] = Initialisation()
     % Convert euler angles to quaternions and display results for checking
     X0 = State_Vector.X0;
     quaternion = e2q(State_Vector.X0(7:9));
-    X_0 = [State_Vector.X0(1:6); quaternion; State_Vector.X0(10:12)];
+    X0 = [State_Vector.X0(1:6); quaternion; State_Vector.X0(10:12)];
 end
 
 

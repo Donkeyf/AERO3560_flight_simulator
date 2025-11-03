@@ -17,7 +17,7 @@ clear; clc; close all;
 %    varargout = Control_GUI_full(varargin);
 
 % Initialise the Flight Data 
-[Flight_Data, X_0, X0] = Initialisation();
+[Flight_Data, X0] = Initialisation();
 
 % Select Manoeuvre to Perform & Generate Control Array
 [U, time] = Controls();
