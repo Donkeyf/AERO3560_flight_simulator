@@ -11,11 +11,6 @@
 % Clear the workspace, command window and close all figures
 clear; clc; close all;
 
-% Open the graphical user interface
-% File folder for Control GUI
-%    addpath('Control GUI/__MACOSX/Control_GUI_updated_AB24/');
-%    varargout = Control_GUI_full(varargin);
-
 % Initialise the Flight Data 
 [Flight_Data, X0] = Initialisation();
 
