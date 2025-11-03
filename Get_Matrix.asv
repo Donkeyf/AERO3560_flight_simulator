@@ -3,7 +3,7 @@ function mat_struct = Get_Matrix(FlightData, lon_struct, IC)
     mat_struct.B_Lon = lon_struct.B_Lon;
     mat_struct.FD = FlightData;
     mat_struct.U0 = IC.U0;
-    mat_struct.X0 = IC.X0;
+    mat_st
 
     
     S = FlightData.Geo.S;

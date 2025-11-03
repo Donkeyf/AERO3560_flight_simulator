@@ -25,10 +25,10 @@ mat = [mat_CG1_100kn, mat_CG2_100kn; mat_CG1_180kn, mat_CG2_180kn];
 
 
 % Load Longitudinal matrices for this CG / V
-f_lon = sprintf('AircraftData/Longitudinal_Matrices_PC9_%s_%dKn_1000ft.mat', token, V_knots(i));
-L     = load(f_lon,'A_lon','B_lon');
-A_lon = mat_CG2_100kn.A_lon; 
-B_lon = mat_CG2_100kn.B_lon;
+%f_lon = sprintf('AircraftData/Longitudinal_Matrices_PC9_%s_%dKn_1000ft.mat', token, V_knots(i));
+%L     = load(f_lon,'A_lon','B_lon');
+A_lon = mat_CG2_100kn.A_Lon; 
+B_lon = mat_CG2_100kn.B_Lon;
 
 % Trim perturbations (linear model starts at Δx=0, Δu=0)
 U0 = zeros(4,1);                     % [δT; δe; δa; δr]
@@ -41,10 +41,10 @@ pulse_s = 0.5; % s (elevator held)
 defl_deg = 5; % deg (elevator magnitude)
 
 fprintf('=== Part B(c): Euler impulse simulations ===\n');
-for i = 1:numel(V_knots)
-    for j = 1:numel(CGs)
+for i = 1:2
+    for j = 1:2
 
-        fprintf('Case: V=%3d kt, %s ... ', V_knots(i), CGs(j));
+        %fprintf('Case: V=%3d kt, %s ... ', V_knots(i), CGs(j));
 
         FD = mat(i, j).FD;
         U0 = mat(i, j).U0;
