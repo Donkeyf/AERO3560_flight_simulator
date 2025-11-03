@@ -1,22 +1,24 @@
-function [] = Integrate(FlightData, X0, Xdot0, U0, time, dt)
-    
-    % Save data from the angular rate converging file into here (AngularRateConvergence needs to be checked)
-    
-    x_n = AngularRateConvergence(FlightData, X0, Xdot0, U0, time, dt);
+function [X_new] = Integrate(Flight_Data, X, U, dt)
+    % X_dot at time t_k
+    x_1dot = StateRates(Flight_Data, X, U);             % First increment
+    An = x_1dot*dt;
 
-    % Calculating the gradient at each step
-    x1 = x_n;
-    a1 = x1 .* dt;
+    % X_dot at time t_k + 0.5
+    x_2dot = StateRates(Flight_Data, X + An/2, U);      % Second increment
+    Bn = x_2dot*dt;
 
-    x2 = x1 + (a1./2);
-    a2 = x2 .* dt;
+    % X_dot at time t_k + 0.5
+    x_3dot = StateRates(Flight_Data, X + Bn/2, U);      % Third increment
+    Cn = x_3dot*dt;
 
-    x3 = x1 + (a2./2);
-    a3 = x3 .* dt;
+    % X_dot at time t_k + 1
+    x_4dot = StateRates(Flight_Data, X + Cn/2, U);      % Fourth increment
+    Dn = x_4dot*dt;
 
-    x4 = x1 + a3;
-    a4 = x4 .* dt;
+    % Predict total increment in x across timestep as a weighted average
+    X_new = X + (1/6)*(An + 2*Bn + 2*Cn + Dn);    % prediction for x at t_k+1
 
-    % Working out the vector at each respective step
-    xn = X0 + ((1/6).*(a1 + (2.*a2) + (2.*a3) + a4));
+    % Need to normalise quaternion at each timestep
+    quat = X_new(7:10);
+    X_new(7:10) = quat/norm(quat);
 end

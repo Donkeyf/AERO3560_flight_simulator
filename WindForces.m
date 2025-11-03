@@ -4,8 +4,8 @@
 % current state, controls and aircraft data. Uses a simple drag polar
 %   CD = CD0 + k * CL^2
 % with dynamic effects embedded in CL via alphȧ and q̄ when available.
-% Returns positive magnitudes:
-%   Lift = +|L| (up in wind axis),  Drag = +|D| (along the flow).
+% Returns positive lift & drag coefficients to calculate lift and drag
+% forces.
 %
 % Instructions to the user: Call from the force/moment build when
 % FlowProperties.m, AeroAngles.m and AngularRates.m are available.
