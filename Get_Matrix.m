@@ -53,7 +53,7 @@ function mat_struct = Get_Matrix(FlightData, lon_struct, IC)
     
     Ydr = Q * S * Aero.Cydr / m;
     Ndr = Q * S * b * Aero.Cndr / Izz;
-    Ldr = Q * S * b * Aero.Cldr;
+    Ldr = Q * S * b * Aero.Cldr / Ixx;
 
     A_Lat(2, 1) = (Lb + A1 * Nb) / (1 - A1 * B1);
     A_Lat(2, 2) = (Lp + A1 * Np) / (1 - A1 * B1);
@@ -71,7 +71,7 @@ function mat_struct = Get_Matrix(FlightData, lon_struct, IC)
     B_Lat(2, 1) = (Lda + A1 * Nda) / (1 - A1 * B1);
     B_Lat(2, 2) = (Ldr + A1 * Ndr) / (1 - A1 * B1);
     B_Lat(3, 1) = (Nda + A1 * Lda) / (1 - A1 * B1);
-    B_Lat(2, 2) = (Ndr + A1 * Ldr) / (1 - A1 * B1);
+    B_Lat(3, 2) = (Ndr + A1 * Ldr) / (1 - A1 * B1);
 
     mat_struct.A_Lat = A_Lat;
     mat_struct.B_Lat = B_Lat;
