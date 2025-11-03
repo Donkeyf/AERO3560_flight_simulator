@@ -13,6 +13,6 @@ function [alpha, beta] = AeroAngles(X)
     V = norm(X(1:3));
 
     % Calculating Aerodynamic Angles
-    alpha = atan2(w/u);
+    alpha = atan2(w,u);
     beta = asin(v/V);
 end

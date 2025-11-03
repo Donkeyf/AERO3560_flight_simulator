@@ -1,9 +1,9 @@
-function [X0,U0] = Trim(Flight_Data, X)
+function [X0,U0] = Trim(Flight_Data, X0)
 % TRIM - Computes the trim state and control inputs for steady flight.
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
 % ---------------------------------------------------------
-[~, Q] = FlowProperties(Flight_Data, X);
+[~, Q] = FlowProperties(Flight_Data, X0);
 
 % ---------------------------------------------------------
 % 2. Make initial guesses for trim variables
@@ -19,7 +19,7 @@ C_L = (Flight_Data.Inertial.g*Flight_Data.Inertial.m)/(Q*Flight_Data.Geo.S);
 alpha = (C_L - Flight_Data.Aero.CLo)/Flight_Data.Aero.CLa;
 
 % Calculate Aerodyanmic Angles
-[~, beta] = AeroAngles(X);
+[~, beta] = AeroAngles(X0);
 
 % Initial Guesses
 AlphaTrim = alpha;        
@@ -27,7 +27,7 @@ DtTrim    = 0.5;
 DeTrim    = 0;
 
 % Initial trim vector (state variables to solve for)
-XTrim = X;
+XTrim = X0;
 
 % ---------------------------------------------------------
 % 3. Define solver settings
