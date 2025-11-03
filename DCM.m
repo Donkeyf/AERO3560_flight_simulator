@@ -3,10 +3,10 @@ function [Cbe] = DCM(X)
     % body reference frame
 
     % Extracting quaternions
-    q0 = X(1);                                  % Changed (CLW) from '7'
-    q1 = X(2);
-    q2 = X(3);
-    q3 = X(4);
+    q0 = X(7);                                 
+    q1 = X(8);
+    q2 = X(9);
+    q3 = X(10);
 
     % Calculation of the rotation matrix terms
     t11 = q0^2 + q1^2 -q2^2 - q3^2;
