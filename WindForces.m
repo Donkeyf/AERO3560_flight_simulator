@@ -18,7 +18,7 @@ function [C_L, C_D] = WindForces(X, U, Flight_Data, xDot)
     de = U(2);
 
     % Compute velocity, angle of attack and sideslip angle
-    [V, alpha, ~] = AeroAngles(X);
+    [alpha, ~] = AeroAngles(X);
     [alphaDot, ~] = AngularRates(X, xDot);
 
     % Non-dimensionalise terms
@@ -34,7 +34,7 @@ function [C_L, C_D] = WindForces(X, U, Flight_Data, xDot)
     % Drag Coefficient 
     k = Flight_Data.Aero.k;
     CD0 = Flight_Data.Aero.Cdo;
-    C_D = CD0 + k*CL^2;
+    C_D = CD0 + k*C_L^2;
 end
 
 

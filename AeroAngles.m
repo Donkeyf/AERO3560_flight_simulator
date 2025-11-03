@@ -6,10 +6,13 @@ function [alpha, beta] = AeroAngles(X)
 % alpha - Angle of Attack (radians)
 % beta  - Sideslip Angle (radians)
     
-    % Computing Current Velocity
+    % Extract velocity components and magnitude
+    u = X(1);
+    v = X(2);
+    w = X(3);
     V = norm(X(1:3));
 
     % Calculating Aerodynamic Angles
-    alpha = atan2(X(3)/X(1));
-    beta = asin(X(2)/V);
+    alpha = atan2(w/u);
+    beta = asin(v/V);
 end
