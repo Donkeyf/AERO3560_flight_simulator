@@ -49,6 +49,8 @@ for i = 1:length(time)
     X_i = X_new;
 end
 
+% Plot Data
+PlotData(time, X, U)
 
 
 

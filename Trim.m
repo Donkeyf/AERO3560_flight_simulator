@@ -118,7 +118,6 @@ while error > eps && i < max_iter
         % Assemble the relevant column of the Jacobian with the positive
         % and negative perturbations
         J(:, i) = (fx_ip - fx_in)/(2*dx);
-    
     end
     
     % ---------------------------------------------------------
@@ -169,5 +168,4 @@ Xtrim(3) = v*sin(x_i(1));
 alpha = x_i(1);
 Utrim(1) = x_i(2);
 Utrim(2) = x_i(3);
-
-return 
+end 
