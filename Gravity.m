@@ -1,4 +1,4 @@
-function [G] = Gravity(X, Flight_Data)
+function [G] = Gravity(Flight_Data, X)
     % Calculates weight force and rotates it into the body axis reference frame
     
     g = Flight_Data.Inertial.g;     % m/s^2 - Gravity Acceleration

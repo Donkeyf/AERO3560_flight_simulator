@@ -16,6 +16,7 @@ function [C_L, C_D] = WindForces(X, U, Flight_Data, xDot)
     % Extract states from state vector and control vector
     q = X(5);
     de = U(2);
+    V = norm(X(1:3));
 
     % Compute velocity, angle of attack and sideslip angle
     [alpha, ~] = AeroAngles(X);

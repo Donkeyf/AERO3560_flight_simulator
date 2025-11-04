@@ -1,111 +1,149 @@
-function []=plotData(X,X_dot,U,time)
+function PlotData(t, x, u)
+% Convert current states and controls into presentable units (e.g. radians
+% to degrees) and generate plots of all variables relevant to the
+% manoeuvre.
+% Inputs:
+    % t - time vector for simulation
+    % x - state vector array over entire simulation
+    % u - control vector array over entire simulation
+    % save_figs - boolean option to save all figures
+    % CG, V, sim_number - used with save_figs for figure naming and saving
 
-%Plot the data
-for i=1:1:length(time)
-    u(i)=X(1,i);
-    v(i)=X(2,i);
-    w(i)=X(3,i);
-    p(i)=X(4,i).*(180/pi);
-    q(i)=X(5,i).*(180/pi);
-    r(i)=X(6,i).*(180/pi);
-    phi(i)=X(7,i);
-    theta(i)=X(8,i);
-    psi(i)=X(9,i);
-    x(i)=X(11,i);
-    y(i)=X(12,i);
-    z(i)=X(13,i);
-    dT(i) = U(1,i);
-    de(i) = U(2,i).*(180/pi);
-    da(i) = U(3,i).*(180/pi);
-    dr(i) = U(4,i).*(180/pi); 
+% Convert quaternions in the state array to euler angles
+quats = x(7:10, :);
+euler_angles = q2e(quats);
+euler_angles = rad2deg(euler_angles);
+
+% Compute normal load factor with body rates
+q = x(5,:);
+n_z_q = q.*x(1,:)/9.81 + 1;
+
+% Define custom colours
+myred           = [216 30 49]/255;
+myblue          = [27 99 157]/255;
+myblack         = [0 0 0]/255;
+mygreen         = [0 128 0]/255;
+mycyan          = [2 169 226]/255;
+myyellow        = [251 194 13]/255;
+mygray          = [89 89 89]/255;
+
+% Plot all key results 
+figure(Name='Velocity');
+grid on
+hold on
+plot(t, x(1,:))
+plot(t, x(2,:))
+plot(t, x(3,:))
+xlabel('Time (s)')
+ylabel('Velocity (m/s)')
+xlim([0,t(end)])
+legend('$u$', '$v$', '$w$', Location='best')
+hold off
+
+figure(Name='Body Rates');
+grid on
+hold on
+plot(t, x(4,:))
+plot(t, x(5,:))
+plot(t, x(6,:))
+xlabel('Time (s)')
+ylabel('Body rates (rad/s)')
+xlim([0,t(end)])
+legend('$p$', '$q$', '$r$', Location='best')
+hold off
+
+figure(Name='Euler Angles');
+grid on
+hold on
+plot(t, euler_angles(1,:))
+plot(t, euler_angles(2,:))
+plot(t, euler_angles(3,:))
+xlabel('Time (s)')
+ylabel('Euler angles (deg)')
+xlim([0,t(end)])
+ylim([-180,180])
+yticks([-180,-90,0,90,180])
+legend('$\phi$', '$\theta$', '$\psi$', Location='best')
+hold off
+
+figure(Name='Positions');
+grid on
+hold on
+plot(t, x(11,:))
+plot(t, x(12,:))
+plot(t, x(13,:))
+xlabel('Time (s)')
+ylabel('Positions (m)')
+xlim([0,t(end)])
+legend('$x$', '$y$', '$z$', Location='best')
+hold off
+
+figure(Name='Load Factor');
+grid on
+hold on
+plot(t, n_z_q)
+xlabel('Time (s)')
+ylabel('Load factor (-)')
+xlim([0,t(end)])
+% legend('$x$', '$y$', '$z$', Location='best')
+hold off
+
+figure(Name='3D Position');
+plot3(x(11,:), x(12,:), -x(13,:), '-o', 'LineWidth', 1.5, 'MarkerSize', 5); 
+xlabel('x (m)');
+ylabel('y (m)');
+zlabel('z (m)');
+xlim([0,t(end)])
+% title('3D Position Plot');
+grid on; 
+axis equal;
+hold off
+
+figure(Name='Controls')
+hold on
+plot(t, u(1,:))
+plot(t, rad2deg(u(2,:)))
+plot(t, rad2deg(u(3,:)))
+plot(t, rad2deg(u(4,:)))
+% plot(t, filtered_signal)
+xlabel('Time (s)')
+ylabel('$U$')
+xlim([0,t(end)])
+legend('$\delta_T$', '$\delta_e$',"$\delta_a$",'$\delta_r$',Location='southeast')
+hold off
+
+% sideslip = x(2,:)./x(1,:);
+sideslip = x(2,:)./sqrt((x(1,:).^2 + x(2,:).^2 + x(3,:).^2));
+beta = rad2deg(asin(sideslip));
+
+figure(Name='Sideslip');
+grid on
+hold on
+plot(t, beta)
+xlabel('Time (s)')
+ylabel('Sideslip angle (deg)')
+xlim([0,t(end)])
+hold off
+
+figure(Name='Lift coefficient');
+grid on
+hold on
+plot(t, CL)
+xlabel('Time (s)')
+ylabel('$C_L$ (-)')
+xlim([0,t(end)])
+hold off
+
+figure(Name='Deviations');
+grid on
+hold on
+plot(t, x(12,:) - x(12,1), color=myred)
+plot(t, x(13,:) - x(13,1), color=myyellow)
+xlabel('Time (s)')
+ylabel('Positions (m)')
+xlim([0,t(end)])
+legend('$\Delta y$', '$\Delta z$', Location='best')
+hold off
+
 end
-%-------------Sate Variable Plot
-%%U
-figure(1);
-plot(time,u,'*-','LineWidth',2,'Color', 'm');
-xlabel("time (sec)");
-ylabel("Velocity in X (m/s)");
-%%V
-figure(2);
-plot(time,v,'*-','LineWidth',2,'Color', 'b');
-xlabel("time (sec)");
-ylabel("Velocity in Y (m/s)");
-%%W
-figure(3);
-plot(time,w,'*-','LineWidth',2,'Color', 'g');
-xlabel("time (sec)");
-ylabel("Velocity in Z (m/s)");
-%%Roll
-figure(4);
-plot(time,p,'o-','LineWidth',2,'Color', 'c');
-xlabel("time (sec)");
-ylabel("Roll rate (degrees/s)");
-%%Pitch
-figure(5);
-plot(time,q,'o-','LineWidth',2,'Color', 'orange');
-xlabel("time (sec)");
-ylabel(" Pitch rate (degrees/s)");
-%%Yaw
-figure(6);
-plot(time,r,'o-','LineWidth',2,'Color', 'y');
-xlabel("time (sec)");
-ylabel("Yaw rate (degrees/s)");
-
-%%-----------------Attitude 
-%%%Roll angle
-figure(7);
-plot(time,phi,'o-',LineWidth',2,'Color', 'r');    
-xlabel('Time(s)');
-ylabel('Roll Angle (degrees)');
-%%%Pitch Angle
-figure(8);
-plot(time,theta,'o-',LineWidth',2,'Color', 'b');    
-xlabel('Time(s)');
-ylabel('Pitch Angle (degrees)');
-%%%Pitch Angle
-figure(9);
-plot(time,psi,'o-',LineWidth',2,'Color', 'y');    
-xlabel('Time(s)');
-ylabel('Yaw Angle (degrees)');
-Yaw Angle
-%%%Position X
-figure(10);
-plot(time,x,'o-',LineWidth',2,'Color', 'purple');    
-xlabel('Time(s)');
-ylabel('Position in X-axis (m)');
-%%%Position Y
-figure(11);
-plot(time,y,'o-',LineWidth',2,'Color', 'c');    
-xlabel('Time(s)');
-ylabel('Position in Y-axis (m)');
-%%%Position Z
-figure(12);
-plot(time,-z,'o-',LineWidth',2,'Color', 'c');    
-xlabel('Time(s)');
-ylabel('Position in Z-axis (m)');
-%%% Thrust Setting
-figure(13);
-plot(time,dT,'o-',LineWidth',2,'Color', 'g');    
-xlabel('Time(s)');
-ylabel('Thrust Setting (deg)');
-%%% Elevator Deflection 
-figure(14);
-plot(time,de,'o-',LineWidth',2,'Color', 'r');    
-xlabel('Time(s)');
-ylabel('Elevator Deflection (deg)');
-%%% Aileron Deflection 
-figure(15);
-plot(time,da,'o-',LineWidth',2,'Color', 'm');    
-xlabel('Time(s)');
-ylabel('Aileron Deflection (deg)');
-%%% Rudder Deflection
-figure(16);
-plot(time,dr,'o-',LineWidth',2,'Color', 'y');    
-xlabel('Time(s)');
-ylabel('Rudder Deflection (deg)');
-end 
-
-
-
-
 

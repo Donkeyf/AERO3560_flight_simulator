@@ -15,6 +15,7 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
     p = X(4);
     q = X(5);
     r = X(6);
+    V = norm(X(1:3));
 
     % Extracting control vector deflections
     de = u(2);
@@ -23,12 +24,12 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
 
     % Compute velocity, angle of attack and sideslip angle from velocity
     % components
-    [V, alpha, beta] = AeroAngles(X);
+    [alpha, beta] = AeroAngles(X);    
     [alpha_dot, beta_dot] = AngularRates(X, XDot);
 
     % Non-dimensionalise pitch, roll and yaw rates, as well as angular rates
-    b = Flight_Data.Flight_Data.Geo.b;           % Wing span
-    c_bar = Flight_Data.Flight_Data.Geo.c;       % Mean Chord
+    b = Flight_Data.Geo.b;           % Wing span
+    c_bar = Flight_Data.Geo.c;       % Mean Chord
     p_bar = (p*b)/(2*V);            % roll
     q_bar = (q*c_bar)/(2*V);        % pitch
     r_bar = (r*b)/(2*V);            % yaw
@@ -37,7 +38,7 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
 
     % Lift and Drag coefficients
     [CL, CD] = WindForces(X, u, Flight_Data, XDot);
-    T = PropForces(u, X, Flight_Data);
+    T = PropForces(Flight_Data,X, u);
     [~, Q] = FlowProperties(Flight_Data, X);
 
     % Thrust force acts purely in x direction

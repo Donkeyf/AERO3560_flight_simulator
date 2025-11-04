@@ -21,7 +21,7 @@ clear; clc; close all;
 dt = time(2) - time(1);
 
 % Trim aircraft
-[Xtrim, Utrim] = Trim(Flight_Data, X0);
+[Xtrim, Utrim, ~] = Trim(Flight_Data, X0);
 
 % Initialising states array & adding initial state
 X = zeros(length(X0),length(time));
@@ -48,9 +48,6 @@ for i = 1:length(time)
     X(:,i) = X_new;
     X_i = X_new;
 end
-
-% Plot Results
-% PlotData()
 
 
 

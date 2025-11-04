@@ -10,24 +10,42 @@
 % FlowProperties.m and Flight_Data.Prop fields P_max (W) and η (–).
 % Uses sea-level density from Flight_Data.Atmo if available, else 1.225 kg/m³.
 
-function [P_max, T] = PropForces(U, x, Flight_Data)
+function T = PropForces(Flight_Data, X, u)
+% Compute propulsion forces directly in the body axes according to a
+% simple model
+% Refer lecture 9B slide 13
+% Inputs:
+    % FlightData - Aircraft flight data structure
+    % X - state vector
+    % u - control vector
+% Returns:
+    % T - thrust magnitude in x_b axis
 
-    % Extract throttle and efficiency
-    delta_T = U(1);                            % throttle fraction [0..1]
-    eta     = Flight_Data.Prop.eta;
+% Standard sea level atmospheric density
+rho_SL = 1.2256;             % [kg/m^3]
 
-    % Flow properties and speed
-    [rho, ~] = FlowProperties(Flight_Data, x); % air density [kg/m^3]
-    V = sqrt(u^2 + v^2 + w^2);
+% Pull out propulsive values from aircraft FlightData structure
+prop = Flight_Data.Prop;
 
-    % Density ratio and sea-level density
-    rho_SL = 1.225;
-    sigma  = rho / rho_SL;
+% Propeller data
+eta = prop.eta;                     % Propeller efficiency
+P_SL_max = prop.P_max;              % Maximum power at sea level [W]
 
-    % Power available model at altitude
-    P_max_SL = Flight_Data.Prop.P_max;
-    P_max  = P_max_SL * (1.1324*sigma - 0.1324);   % Watts
+% Determine aircraft speed and altitude from state vector, and throttle
+% setting from control vector
+V = norm(X(1:3));
+delta_t = u(1);
 
-    % Thrust along +x_b (scalar). If needed as vector, use [T;0;0].
-    T = eta * (P_max * delta_T) / V;          % Newtons
-end
+% Calculate air density [kg/m^3] given aircraft altitude
+[rho, ~] = FlowProperties(Flight_Data,X);
+
+% Ratio of air densities
+sigma = rho/rho_SL;
+
+% Maximum power at given altitude
+P_max = P_SL_max*(1.1324*sigma - 0.1324);   % [W]
+
+% Aircraft thrust at given airspeed
+T = (eta*P_max/V)*delta_t;          % [N]
+
+return
