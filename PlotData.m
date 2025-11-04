@@ -24,7 +24,7 @@ set(groot,'defaultAxesColorOrder', ...
 alw             = 1;                        % AxesLineWidth
 fsz             = 14;                       % Fontsize
 lw              = 1;                        % LineWidth
-msz             = 3;                        % MarkerSize
+msz             = 1;                        % MarkerSize
 int             = 'latex';                  % Interpreter
 
 set(0,'defaultLineLineWidth',lw);       % set the default line width to lw
@@ -41,8 +41,10 @@ euler_angles = q2e(quats);
 euler_angles = rad2deg(euler_angles);
 
 % Compute normal load factor with body rates
+p = x(4,:);
 q = x(5,:);
-n_z_q = q.*x(1,:)/9.81 + 1;
+r = x(6,:);
+nz_q = q.*x(1,:)/9.81 + 1;
 
 % sideslip 
 sideslip = x(2,:)./sqrt((x(1,:).^2 + x(2,:).^2 + x(3,:).^2));
@@ -152,69 +154,83 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
 
+% Plotting Load Factors
+hFig            = figure(5); clf;
+set(gcf, 'Color', [1 1 1]);
+set(gca, 'Color', [1 1 1]);
+hold on;
+plot(t, nz_q)
 
-figure(Name='Load Factor');
 grid on
-hold on
-plot(t, n_z_q)
-xlabel('Time (s)')
-ylabel('Load factor (-)')
+
+xlabel('Time [s]')
+ylabel('Load Factor')
 xlim([0,t(end)])
-% legend('$x$', '$y$', '$z$', Location='best')
-hold off
+box on
+set(gca,'GridLineStyle','-')
+set(gca,'MinorGridLineStyle','-')
+set(gca,'GridColor','k')
+set(gca,'MinorGridColor','k')
+set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
+
+[hleg] = legend('$n_z$');
+set(hleg,'EdgeColor',hleg.Color);
+set(hleg,'Location','best');
+
 
 figure(Name='3D Position');
-plot3(x(11,:), x(12,:), -x(13,:), '-o', 'LineWidth', 1.5, 'MarkerSize', 5); 
+plot3(x(11,:), x(12,:), x(13,:), '-o', 'LineWidth', lw, 'MarkerSize', msz); 
 xlabel('x (m)');
 ylabel('y (m)');
 zlabel('z (m)');
 xlim([0,t(end)])
-% title('3D Position Plot');
 grid on; 
 axis equal;
 hold off
 
-figure(Name='Controls')
-hold on
+% Plotting Positions
+hFig            = figure(7); clf;
+set(gcf, 'Color', [1 1 1]);
+set(gca, 'Color', [1 1 1]);
+hold on;
 plot(t, u(1,:))
 plot(t, rad2deg(u(2,:)))
 plot(t, rad2deg(u(3,:)))
 plot(t, rad2deg(u(4,:)))
-% plot(t, filtered_signal)
-xlabel('Time (s)')
-ylabel('$U$')
-xlim([0,t(end)])
-legend('$\delta_T$', '$\delta_e$',"$\delta_a$",'$\delta_r$',Location='southeast')
-hold off
 
-figure(Name='Sideslip');
 grid on
-hold on
+
+xlabel('Time [s]')
+ylabel('Control Inputs')
+xlim([0,t(end)])
+box on
+set(gca,'GridLineStyle','-')
+set(gca,'MinorGridLineStyle','-')
+set(gca,'GridColor','k')
+set(gca,'MinorGridColor','k')
+set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
+
+[hleg] = legend('$\delta_T$ [\%]','$\delta_e$ [$^\circ$]','$\delta_a$ [$^\circ$]','$\delta_r$ [$^\circ$]');
+set(hleg,'EdgeColor',hleg.Color);
+set(hleg,'Location','best');
+
+% Plotting Positions
+hFig            = figure(8); clf;
+set(gcf, 'Color', [1 1 1]);
+set(gca, 'Color', [1 1 1]);
+hold on;
 plot(t, beta)
-xlabel('Time (s)')
-ylabel('Sideslip angle (deg)')
-xlim([0,t(end)])
-hold off
 
-figure(Name='Lift coefficient');
 grid on
-hold on
-plot(t, CL)
-xlabel('Time (s)')
-ylabel('$C_L$ (-)')
-xlim([0,t(end)])
-hold off
 
-figure(Name='Deviations');
-grid on
-hold on
-plot(t, x(12,:) - x(12,1), color=myred)
-plot(t, x(13,:) - x(13,1), color=myyellow)
-xlabel('Time (s)')
-ylabel('Positions (m)')
+xlabel('Time [s]')
+ylabel('Sideslip Angle ($\beta$) [$^\circ$]')
 xlim([0,t(end)])
-legend('$\Delta y$', '$\Delta z$', Location='best')
-hold off
-
+box on
+set(gca,'GridLineStyle','-')
+set(gca,'MinorGridLineStyle','-')
+set(gca,'GridColor','k')
+set(gca,'MinorGridColor','k')
+set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 end
 
