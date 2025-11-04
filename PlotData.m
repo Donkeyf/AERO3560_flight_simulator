@@ -152,17 +152,6 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
 
-figure(Name='Positions');
-grid on
-hold on
-plot(t, x(11,:))
-plot(t, x(12,:))
-plot(t, x(13,:))
-xlabel('Time (s)')
-ylabel('Positions (m)')
-xlim([0,t(end)])
-legend('$x$', '$y$', '$z$', Location='best')
-hold off
 
 figure(Name='Load Factor');
 grid on
