@@ -20,7 +20,7 @@ Lon_CG1_100kn = load("AircraftData//Longitudinal_Matrices_PC9_nominalCG1_100Kn_1
 Lon_CG1_180kn = load("AircraftData//Longitudinal_Matrices_PC9_nominalCG1_180Kn_1000ft.mat");
 
 mat_CG2_100kn = Get_Matrix(FlightData_CG2, Lon_CG2_100kn, IC_CG2_100kn);
-mat_CG2_180kn = Get_Matrix(FlightData_CG2, Lon_CG2_180kn, IC_CG2_100kn);
+mat_CG2_180kn = Get_Matrix(FlightData_CG2, Lon_CG2_180kn, IC_CG2_180kn);
 mat_CG1_100kn = Get_Matrix(FlightData_CG1, Lon_CG1_100kn, IC_CG1_100kn);
 mat_CG1_180kn = Get_Matrix(FlightData_CG1, Lon_CG1_180kn, IC_CG1_180kn);
 
@@ -58,16 +58,16 @@ for i = 1:2
         B_lon = mat(i,j).B_Lon;
 
         % After elevator call
-        [t, Xlon_elev, Ulon_elev] = impulseResponseLinear(A_lon, B_lon, 2, defl_deg, pulse_s, T_end, dt_s);
+        [t, Xlon_elev, Ulon_elev] = eulerImpulseSim(A_lon, B_lon, 2, defl_deg, pulse_s, T_end, dt_s);
         if size(Xlon_elev,1) ~= numel(t), Xlon_elev = Xlon_elev.'; end
         if size(Ulon_elev,1) ~= numel(t), Ulon_elev = Ulon_elev.'; end
 
         % If you keep lateral calls for later use:
-        [~, Xlat_ail, Ulat_ail] = impulseResponseLinear(A_lat, B_lat, 1, defl_deg, pulse_s, T_end, dt_s);
+        [~, Xlat_ail, Ulat_ail] = eulerImpulseSim(A_lat, B_lat, 1, defl_deg, pulse_s, T_end, dt_s);
         if size(Xlat_ail,1) ~= numel(t), Xlat_ail = Xlat_ail.'; end
         if size(Ulat_ail,1) ~= numel(t), Ulat_ail = Ulat_ail.'; end
 
-        [~, Xlat_rud, Ulat_rud] = impulseResponseLinear(A_lat, B_lat, 2, defl_deg, pulse_s, T_end, dt_s);
+        [~, Xlat_rud, Ulat_rud] = eulerImpulseSim(A_lat, B_lat, 2, defl_deg, pulse_s, T_end, dt_s);
         if size(Xlat_rud,1) ~= numel(t), Xlat_rud = Xlat_rud.'; end
         if size(Ulat_rud,1) ~= numel(t), Ulat_rud = Ulat_rud.'; end
 
@@ -95,14 +95,7 @@ ylabel('q [deg/s]'); xlabel('t [s]');
 
 
 % File: impulseResponseLinear.m
-%
-% Description:
-%   Explicit-Euler simulation of the linear system
-%       x_dot = A x + B u
-%   with a single-channel control “impulse” (step held for pulse_s seconds).
-%   Returns time vector t, state history X and input history U with
-%   rows corresponding to time.
-%
+
 % Inputs:
 %   A, B      : state and input matrices
 %   chan      : control channel index to excite (1-based)
@@ -116,7 +109,7 @@ ylabel('q [deg/s]'); xlabel('t [s]');
 %   X         : N×n state history (rows = time)
 %   U         : N×m input history (rows = time)
 
-function [t, X, U] = impulseResponseLinear(A, B, chan, mag_deg, pulse_s, T_end, dt)
+function [t, X, U] = eulerImpulseSim(A, B, chan, mag_deg, pulse_s, T_end, dt)
 
     % Time grid
     t = 0:dt:T_end;
@@ -131,11 +124,7 @@ function [t, X, U] = impulseResponseLinear(A, B, chan, mag_deg, pulse_s, T_end, 
     U = zeros(N, m);          % baseline Δu = 0
 
     % Build control pulse on the selected channel
-    u_mag = mag_deg;
-    if chan ~= 1
-        % Assume channel 1 is throttle (unitless), others are in degrees
-        u_mag = deg2rad(mag_deg);   % convert surface deflection to radians
-    end
+    u_mag = deg2rad(mag_deg);
     U(t <= pulse_s, chan) = u_mag;
 
     % Explicit Euler integration
