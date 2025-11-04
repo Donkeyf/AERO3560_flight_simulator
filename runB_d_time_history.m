@@ -16,19 +16,47 @@ for k = 1:numel(S)
     V  = S(k).meta.V;
     CG = S(k).meta.CG;
 
-    % Longitudinal (elevator): [u, alpha, q, theta, z_e]
+   % Longitudinal (elevator): [du, dw, q, theta, dh]
     X = S(k).lon.elev.X;
+
+    du     = X(:,1);    % m/s
+    dw     = X(:,2);    % m/s
+    q      = X(:,3);    % rad/s
+    theta  = X(:,4);    % rad
+    dh     = X(:,5);    % m (delta altitude)
+
     figure('Name', sprintf('Longitudinal %s V=%g', CG, V));
     tiledlayout(2,2,'Padding','compact');
 
-    nexttile; plot(t, rad2deg(X(:,2))); hold on; plot(t, rad2deg(X(:,4)));
-    grid on; legend('\alpha','\theta','location','best'); ylabel('angle [deg]'); title('Angles');
+    % Angles panel: use theta only, or theta + approx alpha if you want
+    nexttile;
+    plot(t, rad2deg(theta)); 
+    grid on;
+    ylabel('\theta [deg]'); 
+    title('Pitch angle');
 
-    nexttile; plot(t, rad2deg(X(:,3))); grid on; ylabel('q [deg/s]'); title('Rates');
+    % Rates panel
+    nexttile;
+    plot(t, rad2deg(q));
+    grid on;
+    ylabel('q [deg/s]');
+    title('Pitch rate');
 
-    nexttile; plot(t, X(:,1)); grid on; ylabel('u [m/s]'); title('Velocities'); xlabel('t [s]');
+    % Velocity panel
+    nexttile;
+    plot(t, du);
+    grid on;
+    ylabel('u [m/s]');
+    xlabel('t [s]');
+    title('Forward speed');
 
-    nexttile; plot(t, X(:,5)); grid on; ylabel('Delta Alt [m]'); title('Altitude'); xlabel('t [s]');
+    % Altitude panel
+    nexttile;
+    plot(t, dh);
+    grid on;
+    ylabel('\Delta h [m]');
+    xlabel('t [s]');
+    title('Altitude');
 
     % == Lateral Aileron: [beta, p, r, phi, psi]
     Xa = S(k).lat.ail.X;
