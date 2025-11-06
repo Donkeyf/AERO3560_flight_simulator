@@ -11,7 +11,7 @@
 % Xtrim - The trim state of the aircraft.
 % Utrim - The trim control vector to maintain steady-level flight.
 
-function [Xtrim, Utrim] = Trim(Flight_Data, X0)
+function [Xtrim, Utrim, alpha] = Trim(Flight_Data, X0)
 % ---------------------------------------------------------
 % 1. Compute flow properties (density, dynamic pressure, etc.)
 % ---------------------------------------------------------
@@ -169,6 +169,7 @@ Xtrim(2) = v*sin(-beta_0);
 Xtrim(3) = v*sin(x_i(1));
 
 % Control vector components
+alpha = x_i(1);
 Utrim(1) = x_i(2);
 Utrim(2) = x_i(3);
 end 

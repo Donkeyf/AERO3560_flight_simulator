@@ -16,8 +16,8 @@ function T = PropForces(Flight_Data, X, u)
 rho_SL = 1.2256;             % [kg/m^3]
 
 % Propeller data
-eta = Flight_Data.prop.eta;              % Propeller efficiency
-P_SL_max = Flight_Data.prop.P_max;       % Maximum power at sea level [W]
+eta = Flight_Data.Prop.eta;              % Propeller efficiency
+P_SL_max = Flight_Data.Prop.P_max;       % Maximum power at sea level [W]
 
 % Extract/Determine aircraft speed and throttle setting 
 V = norm(X(1:3));
