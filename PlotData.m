@@ -78,6 +78,7 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 [hleg] = legend('$u$', '$v$', '$w$');
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
+print -dpng -r300 Velocities
 
 % Plotting Body Rates
 hFig            = figure(2); clf;
@@ -103,6 +104,7 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 [hleg] = legend('$p$', '$q$', '$r$');
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
+print -dpng -r300 BodyRates
 
 % Plotting Euler Angles
 hFig            = figure(3); clf;
@@ -128,6 +130,7 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 [hleg] = legend('$\phi$', '$\theta$', '$\psi$');
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
+print -dpng -r300 EulerAngles
 
 % Plotting Positions
 hFig            = figure(4); clf;
@@ -153,6 +156,8 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 [hleg] = legend('$x$', '$y$', '$z$');
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
+print -dpng -r300 Positions
+
 
 % Plotting Load Factors
 hFig            = figure(5); clf;
@@ -176,6 +181,7 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 [hleg] = legend('$n_z$');
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
+print -dpng -r300 LoadFactor
 
 
 figure(Name='3D Position');
@@ -187,8 +193,9 @@ xlim([0,t(end)])
 grid on; 
 axis equal;
 hold off
+print -dpng -r300 3Dposition
 
-% Plotting Positions
+% Plotting Controls
 hFig            = figure(7); clf;
 set(gcf, 'Color', [1 1 1]);
 set(gca, 'Color', [1 1 1]);
@@ -197,6 +204,7 @@ plot(t, u(1,:))
 plot(t, rad2deg(u(2,:)))
 plot(t, rad2deg(u(3,:)))
 plot(t, rad2deg(u(4,:)))
+
 
 grid on
 
@@ -213,8 +221,9 @@ set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 [hleg] = legend('$\delta_T$ [\%]','$\delta_e$ [$^\circ$]','$\delta_a$ [$^\circ$]','$\delta_r$ [$^\circ$]');
 set(hleg,'EdgeColor',hleg.Color);
 set(hleg,'Location','best');
+print -dpng -r300 Controls
 
-% Plotting Positions
+% Plotting Sideslip
 hFig            = figure(8); clf;
 set(gcf, 'Color', [1 1 1]);
 set(gca, 'Color', [1 1 1]);
@@ -233,4 +242,6 @@ set(gca,'GridColor','k')
 set(gca,'MinorGridColor','k')
 set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
 end
+print -dpng -r300 Sideslip
+
 
