@@ -1,15 +1,16 @@
-% Function Initialisation
-% This function asks user to select one of four flight configurations,
-% loading all of the required to simulate the flight of the aircraft -
-% inertial and geometric properties, engine power and aerodynamic
-% coefficients.
-
-% Initialisation.m will extract the following outputs from AircraftData
-% Flight_Data which includes aircraft specifications and control
-% coefficients and other flight control parameters.
-% X0 & X_0, the initial state vector with Euler Angles & quaternions.
-
-% Group: Wingtip Warriors
+% Generates a pop-up menu that asks the user to select one of four
+% flight-conditions to simulate, a combination of two different speeds and CG
+% locations.
+%
+% Inputs
+% None
+%
+% Outputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% X0 - The initial aircraft state featuring quaternions instead of Euler
+% angles.
 
 function [Flight_Data, X0] = Initialisation()
 

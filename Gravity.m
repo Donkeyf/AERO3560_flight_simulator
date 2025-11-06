@@ -1,3 +1,14 @@
+% Determines the weight force acting on the aircraft in the body frame.
+% 
+% Inputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% X - Aircraft state vector.
+% 
+% Outputs
+% G - Weight force vector acting in the body frame.
+
 function [G] = Gravity(Flight_Data, X)
     % Calculates weight force and rotates it into the body axis reference frame
     

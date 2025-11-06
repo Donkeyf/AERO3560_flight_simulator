@@ -1,17 +1,11 @@
-%% C_y matrix
-% What does this function do?
-% This function generates the C_y matrix for a given pitching angle theta.
-
-% You must Input:
-% theta: Pitching angle
-
-% Output will be:
-% Cy_matrix: 3x3 rotation matrix
-
-% Main Author:
-% 500028951, K.
-
-% Group number: Seven.
+% Determines the rotation matrix about the y-axis.
+%
+% Inputs
+% theta - Any angle to rotate the aircraft about the y-axis by. [rad]
+%
+% Ouputs
+% Cy - 3x3 rotation matrix to rotate any vectors about the y-axis by theta
+% rad.
 
 function Cy = C_y(theta)
     cos_theta = cos(theta);

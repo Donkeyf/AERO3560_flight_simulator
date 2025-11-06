@@ -1,3 +1,16 @@
+% Determines the state rates for a given state and control vector. Requires
+% an iterative approach to ensure angular rate convergence.
+% 
+% Inputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% X - Aircraft state vector.
+% U - Aircraft control vector.
+%
+% Outputs
+% Xdot - State Rate vector.
+
 function Xdot = StateRates(Flight_Data, X, U) 
 % Initialise values for angular rates
 alpha_dot = 0;
@@ -46,18 +59,19 @@ end
 
 
 
-function x_dot = compute_rates(Flight_Data, X, x_dot, u_control)
-% Compute the time derivatives of each state variable, using quaternions to
-% keep track of the aircrafts attitude. Standard equations are used to
-% calculate the rates for each element of the state vector, with velocity,
-% body rates, quaternions and positions.
-% Inputs:
-    % Flight_Data - aircraft flight data structure
-    % X - aircraft state vector 
-    % x_dot - state rate vector at previous iteration
-    % u_control - aircraft control state vector
-% Returns:
-    % x_dot - aircraft state rate vector
+function Xdot = compute_rates(Flight_Data, X, xdot, U)
+% Calculates the derivatives of each state variable.
+% 
+% Inputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% X - Aircraft state vector.
+% xdot - Initial state rates vector - derivative of each state variable.
+% U - Aircraft control vector.
+%
+% Outputs
+% Xdot - State rate vector.
 
 % Extract states from state vector
 u = X(1);
@@ -79,23 +93,17 @@ C = InertialCoefficients(Flight_Data);
 
 % Compute external forces in body frame
 F_gb = Gravity(Flight_Data, X);           % Gravity forces
-[F_A, M_A] = BodyForces(Flight_Data, X, u_control, x_dot);    % Aerodynamic forces
+[F_A, M_A] = BodyForces(Flight_Data, X, U, xdot);    % Aerodynamic forces
 
 % Velocity rates
 u_dot = (1/Flight_Data.Inertial.m) * (F_gb(1) + F_A(1)) + r*v - q*w;
 v_dot = (1/Flight_Data.Inertial.m) * (F_gb(2) + F_A(2)) - r*u + p*w;
 w_dot = (1/Flight_Data.Inertial.m) * (F_gb(3) + F_A(3)) + q*u - p*v;
 
-% Assume thrust force acts purely in x and along the centre of mass, so
-% does not generate moments in any of x, y, or z directions
-M_Tx = 0;
-M_Ty = 0;
-M_Tz = 0;
-
 % Moments
-L = M_A(1) + M_Tx;
-M = M_A(2) + M_Ty;
-N = M_A(3) + M_Tz;
+L = M_A(1);
+M = M_A(2);
+N = M_A(3);
 
 % Body rate rates
 p_dot = C(4)*p*q + C(5)*q*r + C(2)*L + C(3)*N;
@@ -110,7 +118,7 @@ q3_dot = -1/2*(q2*p - q1*q - q0*r);
 
 % Compute the direction cosine matrix representing the earth to body frame
 C_be = DCM(X);
-C_eb = C_be';   % Body to earth is the inverse (transpose for rotation matrix)
+C_eb = C_be';  
 
 % Position rates in the Earth frame
 pos_dot = C_eb * [u; v; w];
@@ -121,31 +129,41 @@ ye_dot = pos_dot(2);
 ze_dot = pos_dot(3);
 
 % Concatenate into state vector derivative
-x_dot = [u_dot; v_dot; w_dot; p_dot; q_dot; r_dot; q0_dot; q1_dot; q2_dot; q3_dot; xe_dot; ye_dot; ze_dot];
+Xdot = [u_dot; v_dot; w_dot; p_dot; q_dot; r_dot; q0_dot; q1_dot; q2_dot; q3_dot; xe_dot; ye_dot; ze_dot];
 
 end
 
 end
 
 function [C] = InertialCoefficients(Flight_Data)
-    % Extract the inertial field and properties 
-    Ixx = Flight_Data.Inertial.Ixx;
-    Iyy = Flight_Data.Inertial.Iyy;
-    Izz = Flight_Data.Inertial.Izz;
-    Ixz = Flight_Data.Inertial.Ixz;
+% Calculating the inertial coefficients of the aircraft.
+%
+% Inputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% 
+% Outputs
+% C -  Vector containing all of the inertial coefficients.
 
-    % Inertial coefficients
-    C0 = Ixx*Izz - Ixz^2;
-    C1 = Izz/C0;
-    C2 = Ixz/C0;
-    C3 = C2*(Ixx - Iyy + Izz);
-    C4 = C1*(Iyy-Izz) - C2*Ixz;
-    C5 = 1/Iyy;
-    C6 = C5*Ixz;
-    C7 = C5*(Izz - Ixx);
-    C8 = Ixx/C0;
-    C9 = C8*(Ixx-Iyy)+C2*Ixz;
+% Extract the inertial field and properties
+Ixx = Flight_Data.Inertial.Ixx;
+Iyy = Flight_Data.Inertial.Iyy;
+Izz = Flight_Data.Inertial.Izz;
+Ixz = Flight_Data.Inertial.Ixz;
 
-    % Store values
-    C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9];
+% Inertial coefficients
+C0 = Ixx*Izz - Ixz^2;
+C1 = Izz/C0;
+C2 = Ixz/C0;
+C3 = C2*(Ixx - Iyy + Izz);
+C4 = C1*(Iyy-Izz) - C2*Ixz;
+C5 = 1/Iyy;
+C6 = C5*Ixz;
+C7 = C5*(Izz - Ixx);
+C8 = Ixx/C0;
+C9 = C8*(Ixx-Iyy)+C2*Ixz;
+
+% Store values
+C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9];
 end

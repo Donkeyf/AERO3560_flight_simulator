@@ -1,7 +1,13 @@
-function [Cbe] = DCM(X)
-    % Determines the direction cosine matrix to transform from the Earth to the
-    % body reference frame
+% Determines the direction cosine matrix (DCM) to rotate a vector from the
+% Earth to the body frame of an aircraft from its quaternion attitude.
+%
+% Inputs
+% X - Aircraft state vector.
+%
+% Ouputs
+% Cbe - 3x3 DCM to rotate vector from Earth to body axes.
 
+function [Cbe] = DCM(X)
     % Extracting quaternions
     q0 = X(7);                                 
     q1 = X(8);

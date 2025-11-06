@@ -1,16 +1,12 @@
-% File: AngularRates.m
+% Determines the derivatives of the angle of attack and sidelsip angle.
+% 
+% Inputs
+% x - Aircraft state vector.
+% xDot - State rates vector.
 %
-% Description: Compute the angular rates of angle of attack (alpha) and
-% sideslip (beta) from the body-axis translational velocities and their
-% time-derivatives. Uses the kinematic definitions
-%   alpha = atan2(w, u)
-%   beta  = atan2( v, sqrt(u^2 + w^2) )
-% and their exact time derivatives.
-%
-% Instructions to the user:
-% Call this from within the force/moment build (e.g., WindForces.m) or
-% StateRates.m when uDot, vDot, wDot are available. The state vector x is
-% [u v w p q r q0 q1 q2 q3 x_e y_e z_e]^T. Units are SI, angles in radians.
+% Ouputs
+% alphaDot - Rate of change of angle of attack. [rad/s]
+% betaDot - Rate of change of sideslip angle. [rad/s]
 
 function [alphaDot, betaDot] = AngularRates(x, xDot)
     % Extract velocity components and magnitude

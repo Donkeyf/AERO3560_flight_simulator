@@ -1,16 +1,19 @@
-% File: BodyForces.m
+% Computes the aerodynamic forces and moments in the body frame.
+% 
+% Inputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% X - Aircraft state vector.
+% u - Aircraft control vector.
+% XDot - State rates vector containing the derivatives of each state
+% element.
 %
-% Description: Compute aerodynamic forces and moments in the BODY axes.
-% Lift (L), Drag (D) and Sideforce (Y) are formed in the wind/stability
-% frame from coefficient models, then rotated into the body frame. Moments
-% (L, M, N) are computed directly in the body axes.
-%
-% Instructions to the user: Called from the simulation loop by StateRates.
-% Requires FlowProperties.m, AeroAngles.m, AngularRates.m and the rotation
-% helpers C_y.m and C_z.m. Units are SI; angles in radians.
+% Ouputs
+% Forces_b - Aerodynamic forces in the body frame. [N]
+% Moments_b - Aerodynamic moments in the body frame. [Nm]
 
 function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
-
     % Extract body rates
     p = X(4);
     q = X(5);
@@ -22,12 +25,11 @@ function [Forces_b, Moments_b] = BodyForces(Flight_Data, X, u, XDot)
     da = u(3);
     dr = u(4);
 
-    % Compute velocity, angle of attack and sideslip angle from velocity
-    % components
+    % Compute angle of attack and sideslip angle from velocity components
     [alpha, beta] = AeroAngles(X);    
     [alpha_dot, beta_dot] = AngularRates(X, XDot);
 
-    % Non-dimensionalise pitch, roll and yaw rates, as well as angular rates
+    % Non-dimensionalise pitch, roll and yaw rates and angular rates
     b = Flight_Data.Geo.b;           % Wing span
     c_bar = Flight_Data.Geo.c;       % Mean Chord
     p_bar = (p*b)/(2*V);            % roll

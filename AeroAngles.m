@@ -1,11 +1,11 @@
-function [alpha, beta] = AeroAngles(X)
 % Calculates the angle of attack and sideslip angles using the current
-% velocity.
+% body velocities.
 %
 % Outputs:
 % alpha - Angle of Attack (radians)
 % beta  - Sideslip Angle (radians)
-    
+
+function [alpha, beta] = AeroAngles(X)    
     % Extract velocity components and magnitude
     u = X(1);
     v = X(2);

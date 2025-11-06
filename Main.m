@@ -3,7 +3,7 @@
 
 % Description: The purpose of this project and code is a flight controller
 % for the PC-9, military trainer for a set of eight maneouvres including
-% perturbations, turns, rolls and sideslip.
+% perturbations, turns, rolls and sideslip steady heading.
 
 % Instructions to the user: Select 'Editor', click 'run' and 
 % follow the prompts.
@@ -20,8 +20,8 @@ clear; clc; close all;
 % Extracting timestep for integration
 dt = time(2) - time(1);
 
-% Trim aircraft
-[Xtrim, Utrim, ~] = Trim(Flight_Data, X0);
+% Trim aircraft for Steady Level Flight
+[Xtrim, Utrim] = Trim(Flight_Data, X0);
 
 % Initialising states array & adding initial state
 X = zeros(length(X0),length(time));
@@ -30,16 +30,13 @@ X(:,1) = X0;
 % Initialising state to loop with
 X_i = X0;
 
-% Control Array
+% Adding trim settings to control array
 U = Utrim + U;
 
 % Loop through time array and integrate at each timestep
 for i = 1:length(time)
-    % Timestep specific control vector and state
+    % Timestep specific control vector
     U_i = U(:,i);
-
-    % Calculate state rates
-    XDot = StateRates(Flight_Data,X_i,U_i);
 
     % Integrate state rates & update state
     X_new = Integrate(Flight_Data,X_i,U_i,dt);

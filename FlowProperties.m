@@ -1,10 +1,17 @@
+% Calculates air density and dynamic pressure for a given altitude and
+% airspeed.
+% 
+% Inputs
+% Flight_Data - A structure storing all aerodynamic, geometric, inertial,
+% propulsive information required to simulate the aircraft dynamics, also
+% includes the maximum control surface deflections.
+% X - Aircraft state vector.
+% 
+% Ouputs
+% rho - Air density at given altitude. [kg/m^3]
+% Q - Dynamic pressure for given airspeed. [Pa]
+
 function [rho, Q] = FlowProperties(Flight_Data, X)
-% Calculates the air density and dynamic pressure for the current altitude
-% and flight speed.
-%
-% Outputs:
-% Q     - Dynamic Pressure (Pascals)
-% rho   - Air Density (kg/m^3)
     R = 287.05;                             % J/kgK - Gas Constant of Air
     h = -X(end);                            % m - Current Altitude
     V = norm(X(1:3));                       % m/s - Current Velocity
