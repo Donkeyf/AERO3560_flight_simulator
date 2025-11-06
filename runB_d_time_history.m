@@ -10,7 +10,13 @@ function runB_d_time_history(S)
         end
     end
 
-        for k = 1:numel(S)
+    % Font sizes
+    fs_axes   = 12;   % tick labels
+    fs_label  = 14;   % x/y labels
+    fs_title  = 14;   % titles
+    fs_legend = 12;   % legends
+
+    for k = 1:numel(S)
         if ~isstruct(S(k)), continue; end
 
         t  = S(k).t;
@@ -18,7 +24,7 @@ function runB_d_time_history(S)
         CG = S(k).meta.CG;
 
         % Longitudinal (elevator): [du, dw, q, theta, dh]
-        X = S(k).lon.elev.X;
+        X     = S(k).lon.elev.X;
         du    = X(:,1);         % m/s
         dw    = X(:,2);         % m/s (unused in plots, but kept)
         q     = X(:,3);         % rad/s
@@ -32,31 +38,35 @@ function runB_d_time_history(S)
         nexttile;
         plot(t, rad2deg(theta));
         grid on;
-        ylabel('\theta [deg]');
-        title('Pitch angle');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('\theta [deg]','FontSize',fs_label);
+        title('Pitch angle','FontSize',fs_title);
 
         % Pitch rate panel
         nexttile;
         plot(t, rad2deg(q));
         grid on;
-        ylabel('q [deg/s]');
-        title('Pitch rate');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('q [deg/s]','FontSize',fs_label);
+        title('Pitch rate','FontSize',fs_title);
 
         % Forward speed panel
         nexttile;
         plot(t, du);
         grid on;
-        ylabel('u [m/s]');
-        xlabel('t [s]');
-        title('Forward speed');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('u [m/s]','FontSize',fs_label);
+        xlabel('t [s]','FontSize',fs_label);
+        title('Forward speed','FontSize',fs_title);
 
         % Altitude panel (your reference style)
         nexttile;
         plot(t, dh);
         grid on;
-        ylabel('\Delta h [m]');
-        xlabel('t [s]');
-        title('Altitude');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('\Delta h [m]','FontSize',fs_label);
+        xlabel('t [s]','FontSize',fs_label);
+        title('Altitude','FontSize',fs_title);
 
         % ===== Lateral – Aileron impulse: [beta, p, r, phi, psi] =====
         Xa = S(k).lat.ail.X;
@@ -69,32 +79,37 @@ function runB_d_time_history(S)
         plot(t, rad2deg(Xa(:,4))); hold on;
         plot(t, rad2deg(Xa(:,1)));
         grid on;
-        ylabel('angle [deg]');
-        legend('\phi','\beta','Location','best');
-        title('Angles');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('angle [deg]','FontSize',fs_label);
+        lg = legend('\phi','\beta','Location','best');
+        lg.FontSize = fs_legend;
+        title('Angles','FontSize',fs_title);
 
         % Roll rate p
         nexttile;
         plot(t, rad2deg(Xa(:,2)));
         grid on;
-        ylabel('p [deg/s]');
-        title('Roll rate');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('p [deg/s]','FontSize',fs_label);
+        title('Roll rate','FontSize',fs_title);
 
         % Yaw rate r
         nexttile;
         plot(t, rad2deg(Xa(:,3)));
         grid on;
-        ylabel('r [deg/s]');
-        xlabel('t [s]');
-        title('Yaw rate');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('r [deg/s]','FontSize',fs_label);
+        xlabel('t [s]','FontSize',fs_label);
+        title('Yaw rate','FontSize',fs_title);
 
         % Heading psi
         nexttile;
         plot(t, rad2deg(Xa(:,5)));
         grid on;
-        ylabel('\psi [deg]');
-        xlabel('t [s]');
-        title('Heading');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('\psi [deg]','FontSize',fs_label);
+        xlabel('t [s]','FontSize',fs_label);
+        title('Heading','FontSize',fs_title);
 
         % ===== Lateral – Rudder impulse: [beta, p, r, phi, psi] =====
         Xr = S(k).lat.rud.X;
@@ -107,31 +122,36 @@ function runB_d_time_history(S)
         plot(t, rad2deg(Xr(:,4))); hold on;
         plot(t, rad2deg(Xr(:,3)));
         grid on;
-        ylabel('angle [deg]');
-        legend('\phi','r','Location','best');
-        title('Angles');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('angle [deg]','FontSize',fs_label);
+        lg = legend('\phi','r','Location','best');
+        lg.FontSize = fs_legend;
+        title('Angles','FontSize',fs_title);
 
         % Roll rate p
         nexttile;
         plot(t, rad2deg(Xr(:,2)));
         grid on;
-        ylabel('p [deg/s]');
-        title('Roll rate');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('p [deg/s]','FontSize',fs_label);
+        title('Roll rate','FontSize',fs_title);
 
         % Yaw rate r
         nexttile;
         plot(t, rad2deg(Xr(:,3)));
         grid on;
-        ylabel('r [deg/s]');
-        xlabel('t [s]');
-        title('Yaw rate');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('r [deg/s]','FontSize',fs_label);
+        xlabel('t [s]','FontSize',fs_label);
+        title('Yaw rate','FontSize',fs_title);
 
         % Sideslip beta
         nexttile;
         plot(t, rad2deg(Xr(:,1)));
         grid on;
-        ylabel('\beta [deg]');
-        xlabel('t [s]');
-        title('Sideslip');
+        ax = gca; ax.FontSize = fs_axes;
+        ylabel('\beta [deg]','FontSize',fs_label);
+        xlabel('t [s]','FontSize',fs_label);
+        title('Sideslip','FontSize',fs_title);
     end
 end
