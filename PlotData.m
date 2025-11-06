@@ -241,7 +241,8 @@ set(gca,'MinorGridLineStyle','-')
 set(gca,'GridColor','k')
 set(gca,'MinorGridColor','k')
 set(findall(hFig, '-property', 'FontSize'), 'FontSize', fsz)
-end
 print -dpng -r300 Sideslip
+end
+
 
 
