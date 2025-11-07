@@ -22,6 +22,7 @@ dt = time(2) - time(1);
 
 % Trim aircraft for Steady Level Flight
 [Xtrim, Utrim, alpha] = Trim(Flight_Data, X0);
+%Utrim(1) = 0.2413;
 
 % Initialising states array & adding initial state
 X = zeros(length(X0),length(time));

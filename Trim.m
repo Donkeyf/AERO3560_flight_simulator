@@ -28,7 +28,7 @@ function [Xtrim, Utrim, alpha] = Trim(Flight_Data, X0)
 C_L = (Flight_Data.Inertial.m*Flight_Data.Inertial.g)/(Q_0*Flight_Data.Geo.S);
 
 % Initial guesses for trimmed state
-alpha_0 = (C_L - Flight_Data.Aero.CLo)/(Flight_Data.Aero.CLa);
+alpha_0 = 0;
 delta_T_0 = 0.5;
 delta_e_0 = 0;
 

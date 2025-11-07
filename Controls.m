@@ -160,40 +160,16 @@ function [U, t] = Controls()
         % 4-Point Hesitation Roll
         case 8
             data = load('Simulations/4point_hesitation_U_input.mat');
-            % Loading Simulation End Time & Timestep
-            tf = data.GUI_save.SimTime;
-            dt = data.GUI_save.TimeStep;
-
-            % Calculating No. of Timesteps
-            nt = tf/dt + 1;
-
-            % Creating Simulation Time Vector
-            t = linspace(0,tf,nt);
-
-            % Generating Control Array
-            U = extract_control_vector(data,t);
-
-            % Converting Control Surface Deflections to Radians
-            U(2:4,:) = deg2rad(U(2:4,:));
+            time = load('Simulations/4point_hesitation_time.mat');
+            U = data.u_control_smooth;
+            t = time.t;
 
         % Barrel Roll
         case 9
             data = load('Simulations/barrel_roll_U_input.mat');
-            % Loading Simulation End Time & Timestep
-            tf = data.GUI_save.SimTime;
-            dt = data.GUI_save.TimeStep;
-
-            % Calculating No. of Timesteps
-            nt = tf/dt + 1;
-
-            % Creating Simulation Time Vector
-            t = linspace(0,tf,nt);
-
-            % Generating Control Array
-            U = extract_control_vector(data,t);
-
-            % Converting Control Surface Deflections to Radians
-            U(2:4,:) = deg2rad(U(2:4,:));
+            time = load('Simulations/barrel_roll_time.mat');
+            U = data.u_control_smooth;
+            t = time.t;
     end
 end
 

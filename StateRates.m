@@ -30,7 +30,7 @@ while error > eps && counter < iter_max
 
     % Compute the state rates with the previous guess at the rates and
     % state vectors
-    Xdot = compute_rates(Flight_Data, X, X_dot, U);
+    Xdot = rates(Flight_Data, X, X_dot, U);
 
     % Use the updated state rates to compute the angular rates
     [ad_kp1, bd_kp1] = AngularRates(X, X_dot);
@@ -59,7 +59,7 @@ end
 
 
 
-function Xdot = compute_rates(Flight_Data, X, xdot, U)
+function Xdot = rates(Flight_Data, X, xdot, U)
 % Calculates the derivatives of each state variable.
 % 
 % Inputs
