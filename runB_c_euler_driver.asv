@@ -87,12 +87,12 @@ end
 save('PartB_c_soln.mat', 'S');
 fprintf('Saved results to PartB_c_soln.mat\n');
 
-% ---- Sanity plot so something shows immediately ----
+% Sanity plot
 figure;
 plot(t, rad2deg(S(1,1).lon.elev.X(:,3)));
 grid on;
 ax = gca; ax.FontSize = fs_axes;
-title('Check: q response (elevator) for CG1 @ 100 kt','FontSize',fs_title);
+title('Test: q response (elevator) for CG1 @ 100 kt','FontSize',fs_title);
 ylabel('q [deg/s]','FontSize',fs_label);
 xlabel('t [s]','FontSize',fs_label);
 

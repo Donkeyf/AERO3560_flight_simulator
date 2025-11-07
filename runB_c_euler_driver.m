@@ -58,27 +58,49 @@ for i = 1:2
         A_lon = mat(i,j).A_Lon;
         B_lon = mat(i,j).B_Lon;
 
-        % Elevator impulse (longitudinal)
-        [t, Xlon_elev, Ulon_elev] = eulerImpulseSim(A_lon, B_lon, 2, defl_deg, pulse_s, T_end, dt_s);
-        if size(Xlon_elev,1) ~= numel(t), Xlon_elev = Xlon_elev.'; end
-        if size(Ulon_elev,1) ~= numel(t), Ulon_elev = Ulon_elev.'; end
+        % --- Elevator impulse (longitudinal: channel 2) ---
+        [t, Xlon_elev, Ulon_elev] = eulerImpulseSim( ...
+            A_lon, B_lon, 2, defl_deg, pulse_s, T_end, dt_s);
 
-        % Aileron impulse (lateral)
-        [~, Xlat_ail, Ulat_ail] = eulerImpulseSim(A_lat, B_lat, 1, defl_deg, pulse_s, T_end, dt_s);
-        if size(Xlat_ail,1) ~= numel(t), Xlat_ail = Xlat_ail.'; end
-        if size(Ulat_ail,1) ~= numel(t), Ulat_ail = Ulat_ail.'; end
+        % Ensure histories are time-by-state / time-by-input
+        if size(Xlon_elev, 1) ~= numel(t)
+            Xlon_elev = Xlon_elev.';
+        end
+        if size(Ulon_elev, 1) ~= numel(t)
+            Ulon_elev = Ulon_elev.';
+        end
 
-        % Rudder impulse (lateral)
-        [~, Xlat_rud, Ulat_rud] = eulerImpulseSim(A_lat, B_lat, 2, defl_deg, pulse_s, T_end, dt_s);
-        if size(Xlat_rud,1) ~= numel(t), Xlat_rud = Xlat_rud.'; end
-        if size(Ulat_rud,1) ~= numel(t), Ulat_rud = Ulat_rud.'; end
+        % --- Aileron impulse (lateral: channel 1) ---
+        [~, Xlat_ail, Ulat_ail] = eulerImpulseSim( ...
+            A_lat, B_lat, 1, defl_deg, pulse_s, T_end, dt_s);
 
-        % Pack results
-        S(i,j).t = t;
-        S(i,j).lon.elev.X = Xlon_elev;  S(i,j).lon.elev.U = Ulon_elev;
-        S(i,j).lat.ail.X  = Xlat_ail;   S(i,j).lat.ail.U  = Ulat_ail;
-        S(i,j).lat.rud.X  = Xlat_rud;   S(i,j).lat.rud.U  = Ulat_rud;
-        S(i,j).meta = struct('V', V_knots(i), 'CG', CGs(j));
+        if size(Xlat_ail, 1) ~= numel(t)
+            Xlat_ail = Xlat_ail.';
+        end
+        if size(Ulat_ail, 1) ~= numel(t)
+            Ulat_ail = Ulat_ail.';
+        end
+
+        % --- Rudder impulse (lateral: channel 2) ---
+        [~, Xlat_rud, Ulat_rud] = eulerImpulseSim( ...
+            A_lat, B_lat, 2, defl_deg, pulse_s, T_end, dt_s);
+
+        if size(Xlat_rud, 1) ~= numel(t)
+            Xlat_rud = Xlat_rud.';
+        end
+        if size(Ulat_rud, 1) ~= numel(t)
+            Ulat_rud = Ulat_rud.';
+        end
+
+        % --- Pack results into struct S ---
+        S(i,j).t           = t;
+        S(i,j).lon.elev.X  = Xlon_elev;
+        S(i,j).lon.elev.U  = Ulon_elev;
+        S(i,j).lat.ail.X   = Xlat_ail;
+        S(i,j).lat.ail.U   = Ulat_ail;
+        S(i,j).lat.rud.X   = Xlat_rud;
+        S(i,j).lat.rud.U   = Ulat_rud;
+        S(i,j).meta        = struct('V', V_knots(i), 'CG', CGs(j));
 
         fprintf('done.\n');
     end
@@ -92,7 +114,7 @@ figure;
 plot(t, rad2deg(S(1,1).lon.elev.X(:,3)));
 grid on;
 ax = gca; ax.FontSize = fs_axes;
-title('Check: q response (elevator) for CG1 @ 100 kt','FontSize',fs_title);
+title('Test: q response (elevator) for CG1 @ 100 kt','FontSize',fs_title);
 ylabel('q [deg/s]','FontSize',fs_label);
 xlabel('t [s]','FontSize',fs_label);
 
